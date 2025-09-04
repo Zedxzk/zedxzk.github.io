@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>奚志坤 (Xi Zhikun) - 学术主页</title>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- MathJax for LaTeX support -->
+    <script>
+    MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,9 +30,9 @@
             <div id="sidebar-container"></div>
 
             <main class="main-content">
-                <!-- 关于我组件容器 -->
+                <!-- 个人简介组件容器 -->
                 <div id="about-container"></div>
-                
+                    <div id="education-work-container"></div>
                 <!-- 研究方向组件容器 -->
                 <div id="research-container"></div>
                 

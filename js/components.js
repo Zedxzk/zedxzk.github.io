@@ -18,7 +18,8 @@ class ComponentLoader {
             { id: 'research-container', path: 'components/research.html' },
             { id: 'publications-container', path: 'components/publications.html' },
             { id: 'teaching-container', path: 'components/teaching.html' },
-            { id: 'footer-container', path: 'components/footer.html' }
+            { id: 'footer-container', path: 'components/footer.html' },
+            { id: "education-work-container", path: "components/education_work_exps.html" }
         ];
 
         // 加载所有组件

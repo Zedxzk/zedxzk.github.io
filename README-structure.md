@@ -11,7 +11,7 @@ PersonalPage/
 ├── components/            # 组件文件夹
 │   ├── header.html        # 头部组件
 │   ├── sidebar.html       # 侧边栏组件
-│   ├── about.html         # 关于我组件
+│   ├── about.html         # 个人简介组件
 │   ├── research.html      # 研究方向组件
 │   ├── publications.html  # 发表论文组件
 │   ├── teaching.html      # 教学组件
@@ -38,7 +38,7 @@ PersonalPage/
 
 1. **header.html** - 页面头部，包含姓名、职位和语言切换
 2. **sidebar.html** - 侧边栏，包含头像、联系方式和相关链接
-3. **about.html** - 关于我部分
+3. **about.html** - 个人简介部分
 4. **research.html** - 研究方向部分
 5. **publications.html** - 发表论文列表
 6. **teaching.html** - 教学经历

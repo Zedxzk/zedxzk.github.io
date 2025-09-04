@@ -1,11 +1,11 @@
-
 /* --- 全局样式 --- */
 body {
     /* ✒️ 修改：在字体列表中优先加入楷体，并微调了行高和字间距 */
-    font-family: "SimSun", "STSong", "宋体", "KaiTi", "楷体", "STKaiti","Gorgia", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", serif;
-    line-height: 1.7; /* 📏 调整：增加了行高 */
+    font-family:  "Georgia","KaiTi", "STKaiti", "SimSun", "STSong", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    line-height: 1.2; /* 📏 调整：增加了行高 */
     letter-spacing: 0.5px; /* 📏 调整：增加了字间距 */
     margin: 0;
+    font-size: 16px;
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
@@ -34,11 +34,11 @@ header {
 }
 header h1 {
     margin: 0;
-    font-size: 2.5em;
+    font-size: 3.5em;
     color: #2c3e50;
 }
 header .affiliation {
-    font-size: 1.1em;
+    font-size: 1.5em;
     color: #555;
     margin-top: 5px;
 }
@@ -94,9 +94,13 @@ header .affiliation {
     min-width: 200px;
 }
 .profile-pic {
-    width: 100%;
+    width: 180px;
+    height: 180px;
     border-radius: 50%;
     margin-bottom: 20px;
+    object-fit: cover;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 .sidebar h3 {
     border-bottom: 2px solid #3498db;
@@ -117,6 +121,25 @@ header .affiliation {
 .contact-info a:hover, .links a:hover {
     text-decoration: underline;
 }
+
+/* 邮箱列表样式 */
+.email-list {
+    margin: 6px 0 0 0;
+    padding-left: 18px; /* 让邮箱列表相对于父项缩进 */
+}
+.email-list li {
+    margin: 4px 0;
+    list-style: none; /* 去掉默认圆点 */
+}
+.email-list a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+}
+.email-list a:hover {
+    text-decoration: underline;
+}
+
 .main-content {
     flex: 3;
 }
@@ -142,6 +165,238 @@ h2 {
 }
 .publications-list li em {
     color: #555;
+}
+
+/* --- 研究方向列表样式 --- */
+.research-list {
+    list-style: none;
+    padding: 0;
+}
+
+.research-list li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.research-list li:hover {
+    background-color: #f8f9fa;
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+.research-list li:last-child {
+    border-bottom: none;
+}
+
+/* --- 教育和工作经历样式 --- */
+.subsection {
+    margin-bottom: 25px;
+}
+
+.subsection h3 {
+    font-size: 1.7em;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 4px solid #3498db;
+}
+
+/* 时间线样式 */
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, #3498db, #2980b9);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 25px;
+    padding-left: 25px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 8px;
+    width: 12px;
+    height: 12px;
+    background: #3498db;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 2px #3498db;
+}
+
+.timeline-date {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.timeline-content h4 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.timeline-content p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.timeline-content .description {
+    color: #666;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+/* 获奖荣誉样式 */
+.awards-list {
+    list-style: none;
+    padding: 0;
+}
+
+.awards-list li {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.awards-list li:last-child {
+    border-bottom: none;
+}
+
+.award-year {
+    font-weight: 600;
+    color: #3498db;
+    min-width: 60px;
+    margin-right: 15px;
+}
+
+.award-name {
+    font-weight: 500;
+    color: #2c3e50;
+    flex: 1;
+}
+
+.award-org {
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* --- 论文部分样式 --- */
+.no-publications {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 2px dashed #dee2e6;
+}
+
+.no-papers-text {
+    font-size: 1.2em;
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.crying-emojis {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.emoji {
+    font-size: 2.5em;
+    animation: cry 2s ease-in-out infinite;
+}
+
+.emoji:nth-child(1) { animation-delay: 0s; }
+.emoji:nth-child(2) { animation-delay: 0.5s; }
+.emoji:nth-child(3) { animation-delay: 1s; }
+.emoji:nth-child(4) { animation-delay: 1.5s; }
+
+@keyframes cry {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* --- 教学部分样式 --- */
+.no-teaching {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 2px dashed #f39c12;
+}
+
+.no-teaching-text {
+    font-size: 1.2em;
+    color: #8b4513;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.awkward-emojis {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.awkward-emojis .emoji {
+    font-size: 2.5em;
+    animation: shrug 2.5s ease-in-out infinite;
+}
+
+.awkward-emojis .emoji:nth-child(1) { animation-delay: 0s; }
+.awkward-emojis .emoji:nth-child(2) { animation-delay: 0.7s; }
+.awkward-emojis .emoji:nth-child(3) { animation-delay: 1.4s; }
+.awkward-emojis .emoji:nth-child(4) { animation-delay: 2.1s; }
+
+@keyframes shrug {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(-5deg) scale(1.05); }
+    50% { transform: rotate(5deg) scale(1.1); }
+    75% { transform: rotate(-3deg) scale(1.05); }
+}
+
+.future-text {
+    font-size: 1em;
+    color: #27ae60;
+    margin-top: 15px;
+    font-weight: 600;
+}
+
+/* --- MathJax 样式 --- */
+mjx-container {
+    font-size: 1.1em !important;
+}
+
+mjx-chtml {
+    font-size: inherit !important;
+}
+
+/* 确保数学公式在列表中的对齐 */
+.research-list li mjx-container {
+    vertical-align: middle;
+    margin-left: 5px;
 }
 
 /* --- 页脚 --- */
@@ -193,5 +448,11 @@ footer {
     }
     .main-nav li:last-child a {
         border-bottom: none;
+    }
+    
+    /* 头像响应式 */
+    .profile-pic {
+        width: 120px;
+        height: 120px;
     }
 }

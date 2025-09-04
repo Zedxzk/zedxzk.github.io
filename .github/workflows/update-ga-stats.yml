@@ -7,10 +7,6 @@ on:
   
   # 允许手动触发
   workflow_dispatch:
-  
-  # 每次推送到 main 分支时运行
-  push:
-    branches: [ main ]
 
 # 设置权限
 permissions:
@@ -61,7 +57,7 @@ jobs:
         git config --local user.name "GitHub Action"
         git add ga-stats.json
         if ! git diff --staged --quiet; then
-          git commit -m "Auto-update GA stats $(date)"
+          git commit -m "[skip ci] Auto-update GA stats $(date)"
           git push
         else
           echo "No changes to commit"

@@ -113,7 +113,7 @@ function initGoogleAnalyticsCounter() {
     }
     
     // 在本地开发服务器模式下，显示提示信息并跳过API调用
-    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.port === '5500') {
         console.log('检测到本地开发模式，跳过API调用');
         if (statusElement) {
             statusElement.innerHTML = `
@@ -240,33 +240,19 @@ async function fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalC
             const data = await response.json();
             console.log('API返回数据:', data);
             
-            if (data.today_visits !== undefined || data.days30_visits !== undefined || data.total_visits !== undefined) {
-                // 数据验证和合理性检查
-                const todayVisits = data.today_visits || 0;
-                const days30Visits = data.days30_visits || 0;
-                const totalVisits = data.total_visits || 0;
-                
-                // 合理性检查：30天访问量应该 >= 今日访问量，总访问量应该 >= 30天访问量
-                let finalDays30Visits = days30Visits;
-                if (days30Visits < todayVisits && totalVisits > todayVisits) {
-                    // 如果30天数据异常小，可能是数据问题，使用总访问量作为近似
-                    finalDays30Visits = Math.min(totalVisits, todayVisits * 15); // 假设平均每天一半的今日访问量
-                    console.log('30天数据异常，已调整为:', finalDays30Visits);
-                }
-                
-                // 更新各个计数器
-                todayCountElement.textContent = todayVisits;
-                days30CountElement.textContent = finalDays30Visits;
-                totalCountElement.textContent = totalVisits;
+            if (data.success && data.stats) {
+                // 更新访问者数据
+                todayCountElement.textContent = data.stats.todayUsers || '--';
+                days30CountElement.textContent = data.stats.totalUsers || '--';
+                totalCountElement.textContent = data.stats.totalPageViews || '--';
                 
                 if (statusElement) {
                     const updateTime = data.last_updated || '未知';
                     const timeParts = updateTime.split(' ');
                     const dateOnly = timeParts[0] || updateTime;
-                    const metricType = data.metric_type === 'sessions' ? '会话' : '页面浏览';
                     statusElement.innerHTML = `
-                        <span class="lang-cn">GA ${metricType}数据 (${dateOnly})</span>
-                        <span class="lang-en">GA ${data.metric_type || 'sessions'} data (${dateOnly})</span>
+                        <span class="lang-cn">GA数据 (${dateOnly})</span>
+                        <span class="lang-en">GA data (${dateOnly})</span>
                     `;
                     
                     // 确保应用当前语言设置
@@ -388,6 +374,17 @@ function initGitHubCounter() {
     const statusElement = document.getElementById('counter-status');
     
     if (!counterElement) return;
+    
+    // 在本地开发模式下跳过计数器API
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.port === '5500') {
+        console.log('本地开发模式，跳过GitHub计数器API');
+        counterElement.textContent = '--';
+        if (statusElement) {
+            statusElement.innerHTML = '<span class="lang-cn">本地开发模式</span><span class="lang-en">Local dev mode</span>';
+            setTimeout(applyCurrentLanguage, 100);
+        }
+        return;
+    }
     
     // 显示加载状态
     counterElement.textContent = '--';

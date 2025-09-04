@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>免费访问计数器集成示例</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .service-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .service-card h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .demo-counter {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .pros, .cons {
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pros {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .cons {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .integration-example {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .badge-demo {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .recommendation {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 免费访问计数器服务集成指南</h1>
+        
+        <div class="recommendation">
+            <h3>🎯 推荐方案</h3>
+            <p>考虑到您的需求，我推荐使用 <strong>多服务混合</strong> 的方案：</p>
+            <ul>
+                <li><strong>主要计数</strong>：HitWebCounter (免费、稳定、功能丰富)</li>
+                <li><strong>备用显示</strong>：Visitor Badge (简单、美观)</li>
+                <li><strong>高级功能</strong>：在 Vercel 环境使用自建 API</li>
+            </ul>
+        </div>
+
+        <div class="service-grid">
+            <!-- HitWebCounter -->
+            <div class="service-card">
+                <h3>🔥 HitWebCounter</h3>
+                <div class="demo-counter">
+                    <img src="https://hitwebcounter.com/counter/counter.php?page=8987654&style=0006&nbdigits=5&type=page&initCount=0" 
+                         alt="Visit Counter" style="border: none;">
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>✅ 优点：</strong>
+                        <ul>
+                            <li>完全免费</li>
+                            <li>多种样式可选</li>
+                            <li>支持统计报告</li>
+                            <li>稳定可靠</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>❌ 缺点：</strong>
+                        <ul>
+                            <li>需要外部加载</li>
+                            <li>样式定制有限</li>
+                            <li>依赖第三方服务</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block">
+&lt;img src="https://hitwebcounter.com/counter/counter.php?page=YOUR_PAGE_ID&style=0006&nbdigits=5&type=page&initCount=0" alt="Visit Counter"&gt;
+                </div>
+            </div>
+
+            <!-- Visitor Badge -->
+            <div class="service-card">
+                <h3>🏷️ Visitor Badge</h3>
+                <div class="demo-counter badge-demo">
+                    <img src="https://visitor-badge.laobi.icu/badge?page_id=demo.page&left_color=gray&right_color=blue&left_text=Visitors" 
+                         alt="Visitor Badge">
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>✅ 优点：</strong>
+                        <ul>
+                            <li>美观的徽章样式</li>
+                            <li>支持自定义颜色</li>
+                            <li>轻量级</li>
+                            <li>GitHub 风格</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>❌ 缺点：</strong>
+                        <ul>
+                            <li>功能相对简单</li>
+                            <li>无详细统计</li>
+                            <li>依赖外部服务</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block">
+&lt;img src="https://visitor-badge.laobi.icu/badge?page_id=YOUR_PAGE_ID&left_color=gray&right_color=blue&left_text=Visitors" alt="Visitor Badge"&gt;
+                </div>
+            </div>
+
+            <!-- GitHub API -->
+            <div class="service-card">
+                <h3>🐙 GitHub API 统计</h3>
+                <div class="demo-counter">
+                    <div>总 Stars: <span id="github-stars">--</span></div>
+                    <div>估算访问: <span id="estimated-visits">--</span></div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>✅ 优点：</strong>
+                        <ul>
+                            <li>无需第三方</li>
+                            <li>基于 GitHub</li>
+                            <li>可组合数据</li>
+                            <li>完全控制</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>❌ 缺点：</strong>
+                        <ul>
+                            <li>需要开发</li>
+                            <li>统计不够精确</li>
+                            <li>有 API 限制</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block">
+// 获取 GitHub 仓库统计
+fetch('https://api.github.com/repos/username/repo')
+  .then(response => response.json())
+  .then(data => {
+    console.log('Stars:', data.stargazers_count);
+    console.log('Forks:', data.forks_count);
+  });
+                </div>
+            </div>
+
+            <!-- 本地存储计数 -->
+            <div class="service-card">
+                <h3>💾 本地存储计数</h3>
+                <div class="demo-counter">
+                    <div>本页访问: <span id="local-visits">0</span></div>
+                    <button onclick="incrementLocalCounter()">测试计数</button>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <strong>✅ 优点：</strong>
+                        <ul>
+                            <li>完全本地化</li>
+                            <li>快速响应</li>
+                            <li>无外部依赖</li>
+                            <li>隐私友好</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <strong>❌ 缺点：</strong>
+                        <ul>
+                            <li>仅限单设备</li>
+                            <li>清除缓存丢失</li>
+                            <li>无跨设备同步</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block">
+// 简单的本地计数器
+let visits = localStorage.getItem('visits') || 0;
+visits++;
+localStorage.setItem('visits', visits);
+document.getElementById('counter').textContent = visits;
+                </div>
+            </div>
+        </div>
+
+        <div class="integration-example">
+            <h3>🔧 推荐的混合集成方案</h3>
+            <p>结合多种服务的优势，为不同环境提供最佳体验：</p>
+            
+            <div class="code-block">
+function initSmartCounter() {
+    const isVercel = window.location.hostname.includes('vercel.app');
+    const isGitHub = window.location.hostname.includes('github.io');
+    
+    if (isVercel) {
+        // 使用自建 API (完整功能)
+        loadVercelAPI();
+    } else if (isGitHub) {
+        // 使用免费计数器服务
+        loadHitWebCounter();
+        loadVisitorBadge();
+    } else {
+        // 本地开发使用本地存储
+        loadLocalCounter();
+    }
+}
+
+// HitWebCounter 集成
+function loadHitWebCounter() {
+    const img = document.createElement('img');
+    img.src = 'https://hitwebcounter.com/counter/counter.php?page=YOUR_ID&style=0006&nbdigits=5&type=page&initCount=0';
+    img.alt = 'Visit Counter';
+    img.style.border = 'none';
+    document.getElementById('counter-container').appendChild(img);
+}
+
+// Visitor Badge 集成
+function loadVisitorBadge() {
+    const img = document.createElement('img');
+    img.src = 'https://visitor-badge.laobi.icu/badge?page_id=your.page&left_color=gray&right_color=blue&left_text=Visitors';
+    img.alt = 'Visitor Badge';
+    document.getElementById('badge-container').appendChild(img);
+}
+            </div>
+        </div>
+
+        <h2>🚀 快速实施步骤</h2>
+        <ol>
+            <li><strong>选择主要服务</strong>：推荐 HitWebCounter (功能丰富)</li>
+            <li><strong>获取代码</strong>：访问 <a href="https://hitwebcounter.com/" target="_blank">hitwebcounter.com</a> 获取您的计数器代码</li>
+            <li><strong>集成到页面</strong>：将代码添加到您的 footer 组件中</li>
+            <li><strong>添加备用方案</strong>：集成 Visitor Badge 作为备用显示</li>
+            <li><strong>测试各环境</strong>：确保在不同环境下都能正常工作</li>
+        </ol>
+
+        <div class="recommendation">
+            <h3>💡 实施建议</h3>
+            <p>我建议您采用这个混合方案，这样可以：</p>
+            <ul>
+                <li>✅ <strong>Vercel 环境</strong>：继续使用您现有的高级功能</li>
+                <li>✅ <strong>GitHub Pages</strong>：使用 HitWebCounter + Visitor Badge</li>
+                <li>✅ <strong>本地开发</strong>：使用本地存储计数</li>
+                <li>✅ <strong>备用降级</strong>：多层备用确保总有计数显示</li>
+            </ul>
+            <p>这样既保持了功能的完整性，又大大简化了维护工作！</p>
+        </div>
+    </div>
+
+    <script>
+        // 演示 GitHub API 统计
+        fetch('https://api.github.com/repos/microsoft/vscode')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('github-stars').textContent = data.stargazers_count;
+                document.getElementById('estimated-visits').textContent = Math.floor(data.stargazers_count * 10.5);
+            })
+            .catch(error => {
+                document.getElementById('github-stars').textContent = 'Error';
+                document.getElementById('estimated-visits').textContent = 'Error';
+            });
+
+        // 演示本地计数器
+        function incrementLocalCounter() {
+            let visits = parseInt(localStorage.getItem('demo_visits') || '0');
+            visits++;
+            localStorage.setItem('demo_visits', visits);
+            document.getElementById('local-visits').textContent = visits;
+        }
+
+        // 初始化本地计数器显示
+        document.getElementById('local-visits').textContent = localStorage.getItem('demo_visits') || '0';
+    </script>
+</body>
+</html>

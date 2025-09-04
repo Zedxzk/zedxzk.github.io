@@ -51,7 +51,7 @@ def handler(request):
         client = BetaAnalyticsDataClient(credentials=credentials)
         
         # Your GA4 Property ID
-        property_id = "properties/440914482"  # 替换为你的GA4属性ID
+        property_id = "properties/503780674"  # 替换为你的GA4属性ID
         
         # Calculate date ranges
         today = datetime.now().strftime('%Y-%m-%d')

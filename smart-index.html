@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奚志坤学术主页</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <style>
+        /* 重定向页面的简单样式 */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            display: none; /* 默认隐藏，避免闪烁 */
+        }
+        .redirect-notice {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .manual-link {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .manual-link:hover {
+            background: #0056b3;
+        }
+        .cancel-link {
+            background: #6c757d;
+        }
+        .cancel-link:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div class="redirect-notice">
+        <h2>🚀 智能重定向</h2>
+        <p id="redirect-message">
+            <span class="loading"></span>
+            正在为您选择最佳访问体验...
+        </p>
+        <div id="manual-options" style="display: none;">
+            <p>您可以手动选择：</p>
+            <a href="https://zedxzk-github-io.vercel.app/" class="manual-link">访问 Vercel 版本（推荐）</a>
+            <a href="javascript:loadCurrentSite()" class="manual-link cancel-link">继续当前版本</a>
+        </div>
+    </div>
+
+    <!-- 实际的页面内容（当用户选择留在 GitHub Pages 时显示） -->
+    <div id="main-content" style="display: none;">
+        <!-- 这里会加载原始的 index.html 内容 -->
+    </div>
+
+    <script>
+        // 智能重定向逻辑
+        function smartRedirect() {
+            const hostname = window.location.hostname;
+            const isGitHubPages = hostname.includes('github.io');
+            const isVercel = hostname.includes('vercel.app') || hostname.includes('vercel.dev');
+            
+            // 如果不在 GitHub Pages，直接显示内容
+            if (!isGitHubPages) {
+                loadCurrentSite();
+                return;
+            }
+            
+            // 检查用户偏好
+            const userPreference = localStorage.getItem('site_preference');
+            const lastChoiceTime = localStorage.getItem('preference_time');
+            const now = Date.now();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            
+            // 如果用户最近选择了 GitHub Pages，直接加载
+            if (userPreference === 'github' && lastChoiceTime && (now - lastChoiceTime) < oneWeek) {
+                loadCurrentSite();
+                return;
+            }
+            
+            // 如果用户选择了 Vercel 或者是首次访问，显示重定向
+            document.body.style.display = 'block';
+            
+            // 延迟3秒后自动跳转到 Vercel
+            setTimeout(() => {
+                document.getElementById('redirect-message').innerHTML = 
+                    '<span class="loading"></span>3秒后跳转到功能完整的 Vercel 版本...';
+                
+                // 显示手动选择选项
+                document.getElementById('manual-options').style.display = 'block';
+                
+                // 开始倒计时
+                let countdown = 3;
+                const timer = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        document.getElementById('redirect-message').innerHTML = 
+                            `<span class="loading"></span>${countdown}秒后跳转到功能完整的 Vercel 版本...`;
+                    } else {
+                        clearInterval(timer);
+                        // 保存用户偏好（默认选择）
+                        localStorage.setItem('site_preference', 'vercel');
+                        localStorage.setItem('preference_time', now);
+                        window.location.href = 'https://zedxzk-github-io.vercel.app/';
+                    }
+                }, 1000);
+                
+                // 保存定时器引用以便取消
+                window.redirectTimer = timer;
+            }, 1000);
+        }
+        
+        function loadCurrentSite() {
+            // 取消重定向定时器
+            if (window.redirectTimer) {
+                clearInterval(window.redirectTimer);
+            }
+            
+            // 保存用户偏好
+            localStorage.setItem('site_preference', 'github');
+            localStorage.setItem('preference_time', Date.now());
+            
+            // 加载实际内容
+            fetch('/index.html')
+                .then(response => response.text())
+                .then(html => {
+                    // 替换当前页面内容
+                    document.documentElement.innerHTML = html;
+                })
+                .catch(error => {
+                    // 如果加载失败，直接重定向到 index.html
+                    window.location.href = '/index.html';
+                });
+        }
+        
+        // 页面加载时执行
+        window.addEventListener('load', smartRedirect);
+    </script>
+</body>
+</html>

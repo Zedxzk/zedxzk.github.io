@@ -178,42 +178,127 @@
     </div>
 
     <script>
-        // 自动倒计时跳转
-        let countdown = 10;
-        const countdownElement = document.getElementById('countdown');
-        
-        const timer = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = countdown;
+        // 智能重定向逻辑
+        function smartRedirect() {
+            const hostname = window.location.hostname;
+            const isVercel = hostname.includes('vercel.app') || hostname.includes('vercel.dev');
+            const isGitHubPages = hostname.includes('github.io');
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
             
-            if (countdown <= 0) {
-                clearInterval(timer);
-                window.location.href = 'https://zedxzk-github-io.vercel.app/';
+            // 如果已经在 Vercel，直接跳转到主页
+            if (isVercel) {
+                window.location.href = '/';
+                return;
             }
-        }, 1000);
+            
+            // 如果在 GitHub Pages，检查用户偏好
+            if (isGitHubPages) {
+                const userPreference = localStorage.getItem('preferred_site');
+                const lastChoice = localStorage.getItem('site_choice_time');
+                const now = Date.now();
+                const oneWeek = 7 * 24 * 60 * 60 * 1000; // 一周的毫秒数
+                
+                // 如果用户在一周内选择过 GitHub Pages，尊重用户选择
+                if (userPreference === 'github' && lastChoice && (now - lastChoice) < oneWeek) {
+                    showGitHubPagesChoice();
+                    return;
+                }
+                
+                // 否则推荐 Vercel 版本
+                showVercelRecommendation();
+                return;
+            }
+            
+            // 其他情况（如本地），显示选择页面
+            showChoicePage();
+        }
+        
+        function showVercelRecommendation() {
+            document.querySelector('.auto-redirect').innerHTML = `
+                <strong>🚀 自动重定向：</strong> 
+                检测到您在 GitHub Pages 访问，为获得最佳体验，<span class="countdown" id="countdown">5</span> 秒后将自动跳转到 Vercel 版本
+                <br>
+                <button onclick="cancelRedirect()" style="margin: 10px 5px; padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">取消跳转</button>
+                <button onclick="redirectNow()" style="margin: 10px 5px; padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">立即跳转</button>
+            `;
+            
+            startCountdown(5, 'https://zedxzk-github-io.vercel.app/');
+        }
+        
+        function showGitHubPagesChoice() {
+            document.querySelector('.auto-redirect').innerHTML = `
+                <strong>📍 当前访问：</strong> GitHub Pages 版本<br>
+                <small>根据您的历史选择，继续使用当前版本。如需完整功能，请访问 <a href="https://zedxzk-github-io.vercel.app/" style="color: #1565c0;">Vercel 版本</a></small>
+                <br>
+                <button onclick="continueToMain()" style="margin: 10px 5px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">继续访问主页</button>
+            `;
+        }
+        
+        function showChoicePage() {
+            // 显示默认的选择页面，带自动跳转
+            startCountdown(10, 'https://zedxzk-github-io.vercel.app/');
+        }
+        
+        function startCountdown(seconds, targetUrl) {
+            let countdown = seconds;
+            const countdownElement = document.getElementById('countdown');
+            
+            if (!countdownElement) return;
+            
+            window.redirectTimer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(window.redirectTimer);
+                    window.location.href = targetUrl;
+                }
+            }, 1000);
+        }
+        
+        function cancelRedirect() {
+            clearInterval(window.redirectTimer);
+            localStorage.setItem('preferred_site', 'github');
+            localStorage.setItem('site_choice_time', Date.now());
+            
+            document.querySelector('.auto-redirect').innerHTML = `
+                <strong>✅ 已取消自动跳转</strong><br>
+                <small>将继续使用 GitHub Pages 版本。您的选择已保存，一周内不会再次提示。</small>
+                <br>
+                <button onclick="continueToMain()" style="margin: 10px 5px; padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">继续访问主页</button>
+            `;
+        }
+        
+        function redirectNow() {
+            clearInterval(window.redirectTimer);
+            localStorage.setItem('preferred_site', 'vercel');
+            localStorage.setItem('site_choice_time', Date.now());
+            window.location.href = 'https://zedxzk-github-io.vercel.app/';
+        }
+        
+        function continueToMain() {
+            window.location.href = '/';
+        }
 
         // GitHub Pages 继续访问函数
         function continueToGitHubPages() {
             if (confirm('您选择了 GitHub Pages 版本。\n\n注意：此版本的访问统计为只读模式，无法实时更新。\n\n确定要继续访问吗？')) {
                 // 取消自动跳转
-                clearInterval(timer);
+                if (window.redirectTimer) {
+                    clearInterval(window.redirectTimer);
+                }
+                
+                // 保存用户选择
+                localStorage.setItem('preferred_site', 'github');
+                localStorage.setItem('site_choice_time', Date.now());
+                
                 // 跳转到当前域名的主页（GitHub Pages）
                 window.location.href = window.location.origin + '/';
             }
         }
 
-        // 检测如果当前已经在 Vercel 或 GitHub Pages，则自动跳转到主页
-        if (window.location.hostname.includes('vercel.app') || 
-            window.location.hostname.includes('vercel.dev')) {
-            window.location.href = '/';
-        } else if (window.location.hostname.includes('github.io')) {
-            // 在 GitHub Pages 上，显示特别提示
-            document.querySelector('.auto-redirect').innerHTML = `
-                <strong>📍 当前访问：</strong> GitHub Pages 版本<br>
-                <small>如需完整功能，请访问 <a href="https://zedxzk-github-io.vercel.app/" style="color: #1565c0;">Vercel 版本</a></small>
-            `;
-            clearInterval(timer);
-        }
+        // 页面加载时执行智能重定向
+        window.addEventListener('load', smartRedirect);
     </script>
 </body>
 </html>

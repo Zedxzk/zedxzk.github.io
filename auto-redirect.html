@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奚志坤学术主页 - 智能重定向</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .loading {
+            text-align: center;
+            background: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top: 5px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        .sub-message {
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        .manual-links {
+            margin-top: 20px;
+        }
+        .manual-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 8px 15px;
+            border: 2px solid white;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .manual-links a:hover {
+            background: white;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">
+        <div class="spinner"></div>
+        <div class="message" id="message">正在为您选择最佳访问方式...</div>
+        <div class="sub-message" id="sub-message">请稍候</div>
+        <div class="manual-links" id="manual-links" style="display: none;">
+            <a href="https://zedxzk-github-io.vercel.app/">Vercel 版本</a>
+            <a href="javascript:useCurrentSite()">当前版本</a>
+        </div>
+    </div>
+
+    <script>
+        // 智能重定向逻辑
+        function performSmartRedirect() {
+            const hostname = window.location.hostname;
+            const isVercel = hostname.includes('vercel.app') || hostname.includes('vercel.dev');
+            const isGitHubPages = hostname.includes('github.io');
+            const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+            
+            console.log('当前环境:', { hostname, isVercel, isGitHubPages, isLocal });
+            
+            // 如果已经在 Vercel，直接加载主页
+            if (isVercel) {
+                document.getElementById('message').textContent = '已在最佳环境，正在加载...';
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1000);
+                return;
+            }
+            
+            // 如果在 GitHub Pages，检查用户偏好
+            if (isGitHubPages) {
+                const userPreference = localStorage.getItem('preferred_site');
+                const lastChoice = localStorage.getItem('site_choice_time');
+                const now = Date.now();
+                const oneWeek = 7 * 24 * 60 * 60 * 1000;
+                
+                console.log('用户偏好:', { userPreference, lastChoice, timeDiff: now - lastChoice });
+                
+                // 如果用户明确选择过 GitHub Pages 且在有效期内
+                if (userPreference === 'github' && lastChoice && (now - lastChoice) < oneWeek) {
+                    document.getElementById('message').textContent = '根据您的偏好，继续使用当前版本';
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 1500);
+                    return;
+                }
+                
+                // 如果用户选择过 Vercel 版本
+                if (userPreference === 'vercel') {
+                    document.getElementById('message').textContent = '根据您的偏好，跳转到 Vercel 版本';
+                    document.getElementById('sub-message').textContent = '3秒后自动跳转...';
+                    
+                    let countdown = 3;
+                    const timer = setInterval(() => {
+                        countdown--;
+                        if (countdown > 0) {
+                            document.getElementById('sub-message').textContent = `${countdown}秒后自动跳转...`;
+                        } else {
+                            clearInterval(timer);
+                            window.location.href = 'https://zedxzk-github-io.vercel.app/';
+                        }
+                    }, 1000);
+                    
+                    // 显示手动链接
+                    setTimeout(() => {
+                        document.getElementById('manual-links').style.display = 'block';
+                    }, 1000);
+                    return;
+                }
+                
+                // 首次访问或偏好过期，推荐 Vercel
+                recommendVercel();
+                return;
+            }
+            
+            // 本地或其他环境，直接加载当前页面
+            if (isLocal) {
+                document.getElementById('message').textContent = '本地开发环境，加载当前版本';
+                setTimeout(() => {
+                    window.location.href = '/index.html';
+                }, 1000);
+                return;
+            }
+            
+            // 未知环境，显示选择
+            showManualChoice();
+        }
+        
+        function recommendVercel() {
+            document.getElementById('message').textContent = '推荐使用 Vercel 版本获得最佳体验';
+            document.getElementById('sub-message').textContent = '5秒后自动跳转到功能完整版本...';
+            
+            let countdown = 5;
+            const timer = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    document.getElementById('sub-message').textContent = `${countdown}秒后自动跳转到功能完整版本...`;
+                } else {
+                    clearInterval(timer);
+                    // 记录用户默认选择
+                    localStorage.setItem('preferred_site', 'vercel');
+                    localStorage.setItem('site_choice_time', Date.now());
+                    window.location.href = 'https://zedxzk-github-io.vercel.app/';
+                }
+            }, 1000);
+            
+            // 1秒后显示手动选择链接
+            setTimeout(() => {
+                document.getElementById('manual-links').style.display = 'block';
+            }, 1000);
+        }
+        
+        function showManualChoice() {
+            document.getElementById('message').textContent = '请选择访问方式';
+            document.getElementById('sub-message').textContent = '为您提供多种访问选项';
+            document.getElementById('manual-links').style.display = 'block';
+        }
+        
+        function useCurrentSite() {
+            // 记录用户选择当前站点
+            localStorage.setItem('preferred_site', 'github');
+            localStorage.setItem('site_choice_time', Date.now());
+            window.location.href = '/index.html';
+        }
+        
+        // 页面加载完成后执行
+        window.addEventListener('load', () => {
+            // 短暂延迟以显示加载动画
+            setTimeout(performSmartRedirect, 500);
+        });
+        
+        // 为手动链接添加点击事件
+        document.addEventListener('click', (e) => {
+            if (e.target.href && e.target.href.includes('vercel.app')) {
+                localStorage.setItem('preferred_site', 'vercel');
+                localStorage.setItem('site_choice_time', Date.now());
+            }
+        });
+    </script>
+</body>
+</html>

@@ -116,19 +116,21 @@ async function loadGistStats() {
     if (!counterElement) return;
     
     try {
-        // 公开访问Gist，无需token
+        // 直接访问Gist原始内容URL，绕过API限制
         const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
-        const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        
+        const response = await fetch(RAW_URL, {
             headers: {
-                'Accept': 'application/vnd.github.v3+json'
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache'
             }
         });
         
         if (response.ok) {
-            const gist = await response.json();
-            const content = gist.files['gistfile1.txt']?.content;
+            const content = await response.text();
             
-            if (content) {
+            if (content && content.trim()) {
                 const data = JSON.parse(content);
                 
                 // 更新显示
@@ -151,7 +153,7 @@ async function loadGistStats() {
                 throw new Error('Gist文件内容为空');
             }
         } else {
-            throw new Error(`Gist API错误: ${response.status}`);
+            throw new Error(`Gist访问错误: ${response.status}`);
         }
     } catch (error) {
         console.log('Gist统计加载失败:', error.message);

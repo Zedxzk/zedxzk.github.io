@@ -6,41 +6,20 @@
             <span class="lang-en">📊 Page Statistics</span>
         </p>
         
-        <!-- 访问计数器 -->
+        <!-- GitHub Gist计数器 -->
         <div class="counter-container">
-            <!-- Google Analytics 计数器显示 -->
-            <div class="ga-counter-display" id="ga-counter-display">
-                <div class="counter-grid">
-                    <div class="counter-item">
-                        <span class="counter-label">
-                            <span class="lang-cn">今日访问</span>
-                            <span class="lang-en">Today</span>
-                        </span>
-                        <span id="ga-today-count" class="counter-number">--</span>
-                    </div>
-                    <div class="counter-item">
-                        <span class="counter-label">
-                            <span class="lang-cn">近30天</span>
-                            <span class="lang-en">30 Days</span>
-                        </span>
-                        <span id="ga-30days-count" class="counter-number">--</span>
-                    </div>
-                    <div class="counter-item">
-                        <span class="counter-label">
-                            <span class="lang-cn">总访问</span>
-                            <span class="lang-en">Total</span>
-                        </span>
-                        <span id="ga-total-count" class="counter-number">--</span>
-                    </div>
-                </div>
-                <div class="counter-actions">
-                    <button onclick="refreshGAStats()" class="refresh-btn" title="刷新显示数据">🔄</button>
-                    <button onclick="forceUpdateGAStats()" class="update-btn" title="强制更新后台数据">⚡</button>
+            <div class="github-counter-display">
+                <div class="counter-item">
+                    <span class="counter-label">
+                        <span class="lang-cn">总访问量</span>
+                        <span class="lang-en">Total Visits</span>
+                    </span>
+                    <span id="github-count" class="counter-number">--</span>
                 </div>
                 <div class="counter-status">
-                    <small id="ga-counter-status">
-                        <span class="lang-cn">正在从 Google Analytics 加载...</span>
-                        <span class="lang-en">Loading from Google Analytics...</span>
+                    <small id="counter-status">
+                        <span class="lang-cn">正在加载...</span>
+                        <span class="lang-en">Loading...</span>
                     </small>
                 </div>
             </div>
@@ -48,8 +27,8 @@
         
         <div class="stats-note">
             <small>
-                <span class="lang-cn">💡 基于会话统计，每用户每日计一次 | 数据由 Google Analytics 提供 | 每日自动更新</span>
-                <span class="lang-en">💡 Session-based stats, one count per user per day | Data by Google Analytics | Auto-updated daily</span>
+                <span class="lang-cn">💡 基于GitHub Gist存储，防重复计数 | <a href="gist-config.html" target="_blank">配置Token</a> 以启用Gist计数</span>
+                <span class="lang-en">💡 GitHub Gist-based storage, duplicate-proof | <a href="gist-config.html" target="_blank">Configure Token</a> to enable Gist counter</span>
             </small>
         </div>
     </div>

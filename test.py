@@ -14,34 +14,51 @@ def get_ga_stats():
     try:
         client = BetaAnalyticsDataClient()
 
-        request = RunReportRequest(
+        # 获取所有时间的总访问量（使用 Google Analytics 支持的最大时间范围）
+        request_total = RunReportRequest(
+            property=f"properties/{PROPERTY_ID}",
+            metrics=[Metric(name="screenPageViews")],  # 页面浏览次数
+            date_ranges=[DateRange(start_date="2020-01-01", end_date="today")],  # 从GA4开始到现在
+        )
+
+        response_total = client.run_report(request_total)
+        
+        # 获取今日访问量
+        request_today = RunReportRequest(
             property=f"properties/{PROPERTY_ID}",
             metrics=[Metric(name="screenPageViews")],  # 页面浏览次数
             date_ranges=[DateRange(start_date="today", end_date="today")],
         )
 
-        response = client.run_report(request)
+        response_today = client.run_report(request_today)
 
-        for row in response.rows:
-            today_views = int(row.metric_values[0].value)
-            print("今天的访问次数:", today_views)
-            
-            # 保存到 JSON 文件供前端使用
-            stats = {
-                "total_users": today_views,
-                "today_views": today_views,
-                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "status": "success",
-                "data_source": "Google Analytics API"
-            }
-            
-            with open('ga-stats.json', 'w', encoding='utf-8') as f:
-                json.dump(stats, f, ensure_ascii=False, indent=2)
-            
-            print(f"数据已保存到 ga-stats.json")
-            return stats
+        # 处理总访问量数据
+        total_views = 0
+        if response_total.rows:
+            total_views = int(response_total.rows[0].metric_values[0].value)
+            print("所有时间总访问次数:", total_views)
         
-        # 如果没有数据行，创建空数据文件
+        # 处理今日访问量数据
+        today_views = 0
+        if response_today.rows:
+            today_views = int(response_today.rows[0].metric_values[0].value)
+            print("今天的访问次数:", today_views)
+
+        # 保存到 JSON 文件供前端使用
+        stats = {
+            "total_users": total_views,  # 显示所有时间总访问量
+            "today_views": today_views,  # 今日访问量
+            "period": "所有时间",
+            "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "status": "success",
+            "data_source": "Google Analytics API"
+        }
+        
+        with open('ga-stats.json', 'w', encoding='utf-8') as f:
+            json.dump(stats, f, ensure_ascii=False, indent=2)
+        
+        print(f"数据已保存到 ga-stats.json")
+        return stats        # 如果没有数据行，创建空数据文件
         if not response.rows:
             print("今天暂无访问数据")
             stats = {

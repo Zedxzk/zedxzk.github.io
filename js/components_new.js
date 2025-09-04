@@ -190,24 +190,12 @@ async function loadGistStats() {
                 
                 // 触发GitHub Action更新Gist
                 try {
-                    console.log('🚀 准备触发GitHub Action...');
-                    console.log('📝 数据将发送到GitHub Action:', {
-                        total_visits: data.total_visits,
-                        today_visits: data.today_visits,
-                        last_updated: data.last_updated
-                    });
-                    
+                    console.log('🚀 触发GitHub Action...');
                     await triggerGitHubAction(data);
-                    console.log('✅ GitHub Action触发成功！数据将在后台更新');
+                    console.log('✅ GitHub Action触发成功！');
                 } catch (actionError) {
                     console.log('❌ GitHub Action触发失败:', actionError.message);
-                    console.log('⚠️ 这不影响页面显示，计数仍会正常显示');
-                    
-                    // 如果没有设置token，给出提示
-                    if (actionError.message.includes('GitHub token')) {
-                        console.log('🔧 要启用自动保存，请设置token:');
-                        console.log('localStorage.setItem("github_gist_token", "your_token_here");');
-                    }
+                    console.log('⚠️ 无法更新访问统计到Gist，数据未保存');
                 }
             } else {
                 console.log('🔄 重复访问，跳过计数更新');
@@ -257,85 +245,46 @@ async function triggerGitHubAction(data) {
     console.log('📝 预期更新数据:', JSON.stringify(data, null, 2));
     
     try {
-        // 首先尝试无需认证的方法 - 通过GitHub Issues记录访问
-        await recordVisitViaIssue(data);
-        return true;
-    } catch (issueError) {
-        console.log('📝 尝试备用方案：GitHub Action...');
+        // 使用repository_dispatch触发GitHub Action workflow
+        const response = await fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json',
+                'Authorization': `token ${getGitHubToken()}`
+            },
+            body: JSON.stringify({
+                event_type: 'update_visitor_count',
+                client_payload: {
+                    total_visits: data.total_visits,
+                    today_visits: data.today_visits,
+                    last_updated: data.last_updated,
+                    daily_stats: data.daily_stats,
+                    trigger_time: new Date().toISOString(),
+                    user_agent: navigator.userAgent,
+                    referrer: document.referrer || 'direct',
+                    timestamp: Date.now()
+                }
+            })
+        });
         
-        try {
-            // 使用repository_dispatch触发GitHub Action workflow
-            const response = await fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches', {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json',
-                    'Authorization': `token ${getGitHubToken()}`
-                },
-                body: JSON.stringify({
-                    event_type: 'update_visitor_count',
-                    client_payload: {
-                        total_visits: data.total_visits,
-                        today_visits: data.today_visits,
-                        last_updated: data.last_updated,
-                        daily_stats: data.daily_stats,
-                        trigger_time: new Date().toISOString(),
-                        user_agent: navigator.userAgent,
-                        referrer: document.referrer || 'direct',
-                        timestamp: Date.now()
-                    }
-                })
-            });
-            
-            console.log('📡 GitHub Action触发状态:', response.status);
-            
-            if (response.status === 204) {
-                console.log('✅ GitHub Action触发成功！');
-                console.log('⏳ Action将在后台更新Gist数据...');
-                console.log('🔄 预计1-2分钟后Gist数据将被更新');
-                return true;
-            } else {
-                const errorText = await response.text();
-                console.log('❌ GitHub Action触发失败:', errorText);
-                throw new Error(`Action触发错误: ${response.status} - ${errorText}`);
-            }
-        } catch (error) {
-            console.log('❌ GitHub Action触发失败:', error.message);
-            console.log('💡 数据将仅在本地显示，无法保存到Gist');
-            return false;
+        console.log('📡 GitHub Action触发状态:', response.status);
+        
+        if (response.status === 204) {
+            console.log('✅ GitHub Action触发成功！');
+            console.log('⏳ Action将在后台更新Gist数据...');
+            console.log('🔄 预计1-2分钟后Gist数据将被更新');
+            return true;
+        } else {
+            const errorText = await response.text();
+            console.log('❌ GitHub Action触发失败:', errorText);
+            throw new Error(`Action触发错误: ${response.status} - ${errorText}`);
         }
-    }
-}
-
-// 通过GitHub Issues记录访问（无需认证的备用方案）
-async function recordVisitViaIssue(data) {
-    console.log('📝 记录访问 (无配置模式)...');
-    
-    try {
-        // 方式1: 通过简单的网络请求记录访问痕迹
-        const requests = [
-            // GitHub API请求 (会在GitHub的访问日志中留下记录)
-            fetch(`https://api.github.com/repos/Zedxzk/zedxzk.github.io?_=${Date.now()}`, { 
-                method: 'HEAD',
-                cache: 'no-cache'
-            }).catch(() => {}),
-            
-            // 访问GitHub Pages URL (会在访问统计中记录)
-            fetch(`https://zedxzk.github.io/ping?v=${data.total_visits}&t=${Date.now()}`, {
-                method: 'HEAD',
-                cache: 'no-cache'
-            }).catch(() => {})
-        ];
-        
-        await Promise.all(requests);
-        
-        console.log('✅ 访问记录已发送 (GitHub日志模式)');
-        console.log(`📊 总访问: ${data.total_visits}, 今日: ${data.today_visits}`);
-        
-        return true;
     } catch (error) {
-        console.log('📝 简单记录模式失败，转入GitHub Action模式');
-        throw error; // 让它转到GitHub Action方式
+        console.log('❌ GitHub Action触发失败:', error.message);
+        console.log('💡 数据将仅在本地显示，无法保存到Gist');
+        // 不抛出错误，允许本地显示继续工作
+        return false;
     }
 }
 
@@ -344,11 +293,10 @@ function getGitHubToken() {
     // 优先从localStorage获取
     const token = localStorage.getItem('github_gist_token');
     if (!token) {
-        console.log('💡 GitHub Action模式需要token来触发自动更新');
-        console.log('💡 如需自动保存到Gist，请设置token:');
+        console.log('💡 需要设置GitHub token来触发Action:');
         console.log('localStorage.setItem("github_gist_token", "your_github_token_with_repo_access");');
-        console.log('⚠️ 没有token时，访问计数仍会正常显示，但不会自动保存');
-        throw new Error('需要GitHub token才能触发自动保存 (可选功能)');
+        console.log('⚠️ Token需要有repo权限才能触发GitHub Actions');
+        throw new Error('需要具有repo权限的GitHub token才能触发Action');
     }
     return token;
 }

@@ -77,7 +77,7 @@ function applyCurrentLanguage() {
 
 // GitHub Pages 访问计数器
 function initGitHubCounter() {
-    console.log('初始化Gist访问计数器...');
+    console.log('初始化访问计数器...');
     
     const counterElement = document.getElementById('github-count');
     const todayElement = document.getElementById('today-count');
@@ -85,26 +85,28 @@ function initGitHubCounter() {
     
     if (!counterElement) return;
     
-    // 在本地开发模式下跳过计数器API
-    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.port === '5500') {
-        console.log('本地开发模式，跳过Gist计数器');
-        counterElement.textContent = '--';
-        if (todayElement) todayElement.textContent = '--';
-        if (statusElement) {
-            statusElement.innerHTML = '<span class="lang-cn">本地开发模式</span><span class="lang-en">Local dev mode</span>';
-            setTimeout(applyCurrentLanguage, 100);
-        }
+    // 在本地开发模式下使用CORS代理
+    if (window.location.hostname === '127.0.0.1' || 
+        window.location.hostname === 'localhost' || 
+        window.location.port === '5500' ||
+        window.location.protocol === 'file:') {
+        console.log('本地开发模式，使用CORS代理方式');
+        counterElement.textContent = '...';
+        if (todayElement) todayElement.textContent = '...';
+        
+        // 使用CORS代理方式
+        loadGistStatsWithProxy();
         return;
     }
     
-    // 显示加载状态
+    // 生产环境：尝试Vercel API，失败则fallback到CORS代理
     counterElement.textContent = '...';
     if (todayElement) todayElement.textContent = '...';
     
-    // 加载Gist统计数据
+    // 加载统计数据
     loadGistStats();
     
-    console.log('Gist访问计数器初始化完成');
+    console.log('访问计数器初始化完成');
 }
 
 // 从Vercel API读取访问统计数据
@@ -116,7 +118,7 @@ async function loadGistStats() {
     if (!counterElement) return;
     
     try {
-        console.log('📡 使用Vercel API获取访问统计...');
+        console.log('📡 尝试使用Vercel API获取访问统计...');
         
         // 检查是否需要计数（防重复访问）
         const shouldCount = checkAndUpdateVisit();
@@ -132,7 +134,7 @@ async function loadGistStats() {
             });
             
             if (!response.ok) {
-                throw new Error(`API响应错误: ${response.status}`);
+                throw new Error(`Vercel API不可用: ${response.status}`);
             }
             
             const data = await response.json();
@@ -185,24 +187,10 @@ async function loadGistStats() {
         
     } catch (error) {
         console.log('❌ Vercel API访问失败:', error.message);
+        console.log('🔄 切换到CORS代理方式...');
         
-        // 显示错误状态
-        counterElement.textContent = '--';
-        if (todayElement) todayElement.textContent = '--';
-        
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <span class="lang-cn">Vercel API暂不可用</span>
-                <span class="lang-en">Vercel API unavailable</span>
-            `;
-            setTimeout(applyCurrentLanguage, 100);
-        }
-        
-        // 如果是本地开发环境，尝试fallback到CORS代理方式
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            console.log('🔄 本地环境，尝试CORS代理方式...');
-            await loadGistStatsWithProxy();
-        }
+        // Fallback到CORS代理方式
+        await loadGistStatsWithProxy();
     }
 }
 

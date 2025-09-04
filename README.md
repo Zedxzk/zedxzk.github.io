@@ -69,3 +69,25 @@ MIT License - 详见 [LICENSE](LICENSE) 文件
 ---
 
 📊 **学术主页**: https://zedxzk.github.io
+
+## 🚀 部署到Vercel
+
+这个项目现在支持Vercel部署，提供安全的访问计数API：
+
+### 快速部署步骤：
+
+1. **Fork项目**: Fork这个项目到您的GitHub账户
+2. **连接Vercel**: 在 [Vercel](https://vercel.com) 导入这个仓库
+3. **设置环境变量**: 在Vercel项目设置中添加：
+   - `GIST_TOKEN`: 您的GitHub Personal Access Token (需要gist权限)
+   - `GIST_ID`: 您的Gist ID
+4. **部署**: Vercel会自动部署您的项目
+
+### 优势：
+- ✅ **安全**: Token保存在Vercel服务器，不会暴露
+- ✅ **快速**: 全球CDN加速访问
+- ✅ **免费**: Vercel提供免费托管
+- ✅ **自动**: 无需手动配置触发器
+
+详细部署说明请查看 [VERCEL_SETUP.md](VERCEL_SETUP.md)
+

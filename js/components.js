@@ -107,7 +107,7 @@ function initGitHubCounter() {
     console.log('Gist访问计数器初始化完成');
 }
 
-// 从GitHub Gist读取访问统计数据
+// 从Vercel API读取访问统计数据
 async function loadGistStats() {
     const counterElement = document.getElementById('github-count');
     const todayElement = document.getElementById('today-count');
@@ -116,104 +116,27 @@ async function loadGistStats() {
     if (!counterElement) return;
     
     try {
-        // 使用 cors-anywhere 代理访问Gist
-        const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
-        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        console.log('📡 使用Vercel API获取访问统计...');
         
-        // 尝试多个CORS代理
-        const proxies = [
-            `https://corsproxy.io/?${encodeURIComponent(RAW_URL)}`,
-            `https://api.allorigins.win/get?url=${encodeURIComponent(RAW_URL)}`,
-            `https://cors-anywhere.herokuapp.com/${RAW_URL}`
-        ];
+        // 检查是否需要计数（防重复访问）
+        const shouldCount = checkAndUpdateVisit();
         
-        let data = null;
-        let lastError = null;
-        
-        for (const proxyUrl of proxies) {
-            try {
-                console.log('尝试代理:', proxyUrl);
-                const response = await fetch(proxyUrl, {
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    let content;
-                    if (proxyUrl.includes('allorigins.win')) {
-                        const result = await response.json();
-                        content = result.contents;
-                    } else {
-                        content = await response.text();
-                    }
-                    
-                    if (content && content.trim()) {
-                        data = JSON.parse(content);
-                        console.log('成功获取数据:', data);
-                        break;
-                    }
+        if (shouldCount) {
+            // 使用POST请求增加访问计数
+            console.log('🆕 新访问，增加计数...');
+            const response = await fetch('/api/counter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            } catch (error) {
-                lastError = error;
-                console.log('代理失败:', error.message);
-                continue;
-            }
-        }
-        
-        if (data) {
-            // 检查是否需要计数（防重复访问）
-            const shouldCount = checkAndUpdateVisit();
+            });
             
-            if (shouldCount) {
-                // 增加访问计数
-                const today = new Date().toISOString().split('T')[0];
-                const isNewDay = data.last_updated !== today;
-                
-                console.log('📝 开始更新访问计数...');
-                console.log('当前数据:', data);
-                console.log('是否新的一天:', isNewDay);
-                
-                data.total_visits = (data.total_visits || 0) + 1;
-                data.today_visits = isNewDay ? 1 : (data.today_visits || 0) + 1;
-                data.last_updated = today;
-                
-                // 更新每日统计
-                if (!data.daily_stats) data.daily_stats = {};
-                data.daily_stats[today] = (data.daily_stats[today] || 0) + 1;
-                
-                console.log('✅ 本地计数更新成功:', {
-                    total_visits: data.total_visits,
-                    today_visits: data.today_visits,
-                    last_updated: data.last_updated
-                });
-                
-                // 触发GitHub Action更新Gist
-                try {
-                    console.log('🚀 准备触发GitHub Action (PAT方法)...');
-                    console.log('📝 数据将发送到GitHub Action:', {
-                        total_visits: data.total_visits,
-                        today_visits: data.today_visits,
-                        last_updated: data.last_updated
-                    });
-                    
-                    await triggerGitHubAction(data);
-                    console.log('✅ GitHub Action触发流程完成！');
-                } catch (actionError) {
-                    console.log('❌ GitHub Action触发失败:', actionError.message);
-                    console.log('⚠️ 这不影响页面显示，计数仍会正常显示');
-                    
-                    // 给出设置提示
-                    if (actionError.message.includes('token')) {
-                        console.log('🔧 要启用自动保存，请按以下步骤设置:');
-                        console.log('1. 创建GitHub PAT (只需repo权限)');
-                        console.log('2. 设置: localStorage.setItem("gh_action_trigger_token", "your_token");');
-                        console.log('📖 详细说明请查看 SETUP_INSTRUCTIONS.md 文件');
-                    }
-                }
-            } else {
-                console.log('🔄 重复访问，跳过计数更新');
+            if (!response.ok) {
+                throw new Error(`API响应错误: ${response.status}`);
             }
+            
+            const data = await response.json();
+            console.log('✅ 访问计数更新成功:', data);
             
             // 更新显示
             counterElement.textContent = data.total_visits || 0;
@@ -222,22 +145,46 @@ async function loadGistStats() {
             }
             
             if (statusElement) {
-                const lastUpdated = data.last_updated || '未知';
-                const countStatus = shouldCount ? '已计数' : '重复访问';
                 statusElement.innerHTML = `
-                    <span class="lang-cn">GitHub Action (${lastUpdated}) - ${countStatus}</span>
-                    <span class="lang-en">GitHub Action (${lastUpdated}) - ${shouldCount ? 'Counted' : 'Duplicate'}</span>
+                    <span class="lang-cn">Vercel API (${data.last_updated}) - 已计数</span>
+                    <span class="lang-en">Vercel API (${data.last_updated}) - Counted</span>
                 `;
                 setTimeout(applyCurrentLanguage, 100);
             }
             
-            console.log('Gist统计加载成功:', data);
         } else {
-            throw lastError || new Error('所有代理都失败了');
+            // 使用GET请求只获取数据，不增加计数
+            console.log('� 重复访问，只获取数据...');
+            const response = await fetch('/api/counter', {
+                method: 'GET'
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API响应错误: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('� 获取访问数据成功:', data);
+            
+            // 更新显示
+            counterElement.textContent = data.total_visits || 0;
+            if (todayElement) {
+                todayElement.textContent = data.today_visits || 0;
+            }
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="lang-cn">Vercel API (${data.last_updated}) - 重复访问</span>
+                    <span class="lang-en">Vercel API (${data.last_updated}) - Duplicate</span>
+                `;
+                setTimeout(applyCurrentLanguage, 100);
+            }
         }
         
+        console.log('✅ Vercel访问统计加载完成');
+        
     } catch (error) {
-        console.log('Gist统计加载失败:', error.message);
+        console.log('❌ Vercel API访问失败:', error.message);
         
         // 显示错误状态
         counterElement.textContent = '--';
@@ -245,10 +192,16 @@ async function loadGistStats() {
         
         if (statusElement) {
             statusElement.innerHTML = `
-                <span class="lang-cn">无法加载统计</span>
-                <span class="lang-en">Failed to load stats</span>
+                <span class="lang-cn">Vercel API暂不可用</span>
+                <span class="lang-en">Vercel API unavailable</span>
             `;
             setTimeout(applyCurrentLanguage, 100);
+        }
+        
+        // 如果是本地开发环境，尝试fallback到CORS代理方式
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            console.log('🔄 本地环境，尝试CORS代理方式...');
+            await loadGistStatsWithProxy();
         }
     }
 }
@@ -410,3 +363,67 @@ function checkAndUpdateVisit() {
 document.addEventListener('DOMContentLoaded', function() {
     ComponentLoader.loadAllComponents();
 });
+
+// 备用方法：使用CORS代理（仅用于本地开发）
+async function loadGistStatsWithProxy() {
+    const counterElement = document.getElementById('github-count');
+    const todayElement = document.getElementById('today-count');
+    const statusElement = document.getElementById('counter-status');
+    
+    try {
+        console.log('🔄 使用CORS代理方式加载统计...');
+        
+        const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
+        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        
+        // 尝试多个CORS代理
+        const proxies = [
+            `https://corsproxy.io/?${encodeURIComponent(RAW_URL)}`,
+            `https://api.allorigins.win/get?url=${encodeURIComponent(RAW_URL)}`
+        ];
+        
+        let data = null;
+        
+        for (const proxyUrl of proxies) {
+            try {
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    let content;
+                    if (proxyUrl.includes('allorigins.win')) {
+                        const result = await response.json();
+                        content = result.contents;
+                    } else {
+                        content = await response.text();
+                    }
+                    
+                    if (content && content.trim()) {
+                        data = JSON.parse(content);
+                        break;
+                    }
+                }
+            } catch (error) {
+                continue;
+            }
+        }
+        
+        if (data) {
+            // 只显示数据，不更新计数（因为无法安全地更新Gist）
+            counterElement.textContent = data.total_visits || 0;
+            if (todayElement) {
+                todayElement.textContent = data.today_visits || 0;
+            }
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="lang-cn">只读模式 (${data.last_updated})</span>
+                    <span class="lang-en">Read-only mode (${data.last_updated})</span>
+                `;
+                setTimeout(applyCurrentLanguage, 100);
+            }
+            
+            console.log('✅ CORS代理方式加载成功（只读模式）');
+        }
+    } catch (error) {
+        console.log('❌ CORS代理方式也失败了');
+    }
+}

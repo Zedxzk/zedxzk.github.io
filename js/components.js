@@ -57,63 +57,181 @@ class ComponentLoader {
             }, 100);
         }
         
-        // 初始化StatCounter计数器显示
+        // 初始化Google Analytics计数器显示
         setTimeout(function() {
-            initStatCounterDisplay();
+            initGoogleAnalyticsCounter();
         }, 2000);
     }
 }
 
-// StatCounter 计数器显示和数据提取
-function initStatCounterDisplay() {
-    console.log('初始化StatCounter显示...');
+// Google Analytics 访问计数器
+function initGoogleAnalyticsCounter() {
+    console.log('初始化Google Analytics计数器...');
     
-    // 等待StatCounter脚本加载
-    setTimeout(function() {
-        extractStatCounterData();
-    }, 3000);
+    const visitCountElement = document.getElementById('ga-visit-count');
+    const statusElement = document.getElementById('ga-counter-status');
     
-    // 设置定期检查
-    setInterval(function() {
-        extractStatCounterData();
-    }, 10000); // 每10秒检查一次
-}
-
-// 从StatCounter提取访问数据
-function extractStatCounterData() {
-    const visitCountElement = document.getElementById('visit-count');
     if (!visitCountElement) return;
     
+    // 显示loading状态
+    visitCountElement.textContent = '--';
+    
+    // 方法1: 优先从ga-stats.json文件读取数据
+    fetchGAStatsFromFile(visitCountElement, statusElement);
+    
+    // 方法2: 确保GA跟踪代码正常工作
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+            'page_title': document.title,
+            'page_location': window.location.href
+        });
+    }
+    
+    // 方法3: 备用的本地计数器（5秒后如果还没有数据）
+    setTimeout(function() {
+        if (visitCountElement.textContent === '--') {
+            setupFallbackCounter(visitCountElement, statusElement);
+        }
+    }, 5000);
+}
+
+// 从 GitHub Pages 获取Google Analytics数据
+async function fetchGAStatsFromFile(visitCountElement, statusElement) {
     try {
-        // 方法1: 尝试从StatCounter的全局变量获取数据
-        if (window.sc_counter_data) {
-            visitCountElement.textContent = window.sc_counter_data.count || '--';
-            console.log('从StatCounter全局变量获取数据:', window.sc_counter_data.count);
-            return;
-        }
+        console.log('尝试从 ga-stats.json 获取数据...');
         
-        // 方法2: 尝试从StatCounter的img元素获取数据
-        const statcounterImg = document.querySelector('.statcounter img');
-        if (statcounterImg && statcounterImg.src) {
-            // 从图片URL中提取计数信息
-            const urlMatch = statcounterImg.src.match(/\/(\d+)\/[^\/]*$/);
-            if (urlMatch && urlMatch[1]) {
-                visitCountElement.textContent = urlMatch[1];
-                console.log('从StatCounter图片URL提取数据:', urlMatch[1]);
-                return;
+        // 添加时间戳避免缓存问题
+        const timestamp = new Date().getTime();
+        const response = await fetch(`./ga-stats.json?t=${timestamp}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             }
-        }
+        });
         
-        // 方法3: 使用本地存储作为备用方案
-        let localCount = parseInt(localStorage.getItem('statcounter_visits') || '0');
-        localCount += 1;
-        localStorage.setItem('statcounter_visits', localCount);
-        visitCountElement.textContent = localCount;
-        console.log('使用本地存储计数:', localCount);
+        if (response.ok) {
+            const data = await response.json();
+            console.log('GA JSON数据:', data);
+            
+            if (data.total_users !== undefined) {
+                visitCountElement.textContent = data.total_users;
+                if (statusElement) {
+                    const updateTime = data.last_updated || '未知';
+                    const timeParts = updateTime.split(' ');
+                    const dateOnly = timeParts[0] || updateTime;
+                    statusElement.innerHTML = `
+                        <span class="lang-cn">GA 数据 (${dateOnly})</span>
+                        <span class="lang-en">GA Data (${dateOnly})</span>
+                    `;
+                }
+                return true;
+            } else if (data.error) {
+                console.log('GA JSON错误:', data.error);
+                if (statusElement) {
+                    statusElement.innerHTML = `
+                        <span class="lang-cn">GA 配置错误</span>
+                        <span class="lang-en">GA Config Error</span>
+                    `;
+                }
+            } else if (data.status === 'no_data') {
+                if (statusElement) {
+                    statusElement.innerHTML = `
+                        <span class="lang-cn">暂无数据</span>
+                        <span class="lang-en">No data available</span>
+                    `;
+                }
+                return true; // 仍然算作成功，只是没有数据
+            }
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        console.log('无法读取 ga-stats.json 文件:', error.message);
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">数据加载中...</span>
+                <span class="lang-en">Loading data...</span>
+            `;
+        }
+    }
+    
+    return false;
+}
+
+// 手动刷新GA数据
+async function refreshGAStats() {
+    const visitCountElement = document.getElementById('ga-visit-count');
+    const statusElement = document.getElementById('ga-counter-status');
+    
+    if (!visitCountElement) return;
+    
+    visitCountElement.textContent = '刷新中...';
+    if (statusElement) {
+        statusElement.innerHTML = `
+            <span class="lang-cn">正在刷新数据...</span>
+            <span class="lang-en">Refreshing data...</span>
+        `;
+    }
+    
+    try {
+        // 等待一点时间让用户看到刷新状态
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // 重新获取数据（强制绕过缓存）
+        const success = await fetchGAStatsFromFile(visitCountElement, statusElement);
+        
+        if (!success) {
+            // 如果没有GA数据，使用备用计数器
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="lang-cn">使用本地计数</span>
+                    <span class="lang-en">Using local counter</span>
+                `;
+            }
+            setupFallbackCounter(visitCountElement, statusElement);
+        }
         
     } catch (error) {
-        console.log('StatCounter数据提取失败:', error);
-        visitCountElement.textContent = '--';
+        console.log('刷新失败:', error);
+        setupFallbackCounter(visitCountElement, statusElement);
+    }
+}
+
+// 备用计数器方案
+function setupFallbackCounter(visitCountElement, statusElement) {
+    // 使用localStorage作为备用计数方案
+    let visitCount = parseInt(localStorage.getItem('ga_visit_count') || '0');
+    visitCount += 1;
+    localStorage.setItem('ga_visit_count', visitCount);
+    
+    visitCountElement.textContent = visitCount;
+    
+    if (statusElement) {
+        statusElement.innerHTML = '<span class="lang-cn">本地计数 + GA 后台统计</span><span class="lang-en">Local count + GA backend tracking</span>';
+    }
+    
+    console.log('使用备用计数器，当前访问次数:', visitCount);
+    
+    // 定期检查和更新
+    setInterval(function() {
+        // 这里可以添加定期从后端API获取GA数据的逻辑
+        checkForGAUpdates(visitCountElement, statusElement);
+    }, 30000); // 每30秒检查一次
+}
+
+// 检查GA数据更新
+async function checkForGAUpdates(visitCountElement, statusElement) {
+    try {
+        const success = await fetchGAStatsFromFile(visitCountElement, statusElement);
+        if (!success) {
+            // 如果文件读取失败，保持当前的本地计数
+            console.log('ga-stats.json 文件暂时不可用，继续使用本地计数');
+        }
+    } catch (error) {
+        console.log('定期更新检查失败:', error);
     }
 }
 

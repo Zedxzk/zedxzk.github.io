@@ -8,46 +8,27 @@
         
         <!-- 访问计数器 -->
         <div class="counter-container">
-            <!-- StatCounter 显示区域 -->
-            <div class="statcounter-display" id="statcounter-display">
+            <!-- Google Analytics 计数器显示 -->
+            <div class="ga-counter-display" id="ga-counter-display">
                 <div class="counter-info">
                     <span class="lang-cn">页面访问量: </span>
                     <span class="lang-en">Page Views: </span>
-                    <span id="visit-count" class="counter-number">--</span>
+                    <span id="ga-visit-count" class="counter-number">--</span>
+                    <button onclick="refreshGAStats()" class="refresh-btn" title="刷新数据">🔄</button>
                 </div>
-                
-                <!-- StatCounter 可见计数器 -->
-                <div class="statcounter-widget">
-                    <noscript>
-                        <div class="statcounter">
-                            <a title="Web Analytics Made Easy - Statcounter" 
-                               href="https://statcounter.com/" target="_blank">
-                                <img class="statcounter" 
-                                     src="https://c.statcounter.com/13164698/0/ab250e98/0/" 
-                                     alt="Web Analytics Made Easy - Statcounter"
-                                     referrerPolicy="no-referrer-when-downgrade">
-                            </a>
-                        </div>
-                    </noscript>
+                <div class="counter-status">
+                    <small id="ga-counter-status">
+                        <span class="lang-cn">正在从 Google Analytics 加载...</span>
+                        <span class="lang-en">Loading from Google Analytics...</span>
+                    </small>
                 </div>
             </div>
         </div>
         
-        <!-- StatCounter JavaScript代码 -->
-        <script type="text/javascript">
-        var sc_project=13164698; 
-        var sc_invisible=0; 
-        var sc_security="ab250e98"; 
-        var scJsHost = "https://";
-        document.write("<sc"+"ript type='text/javascript' src='" +
-        scJsHost+
-        "statcounter.com/counter/counter.js'></"+"script>");
-        </script>
-        
         <div class="stats-note">
             <small>
-                <span class="lang-cn">💡 数据由 StatCounter 提供实时统计 | 访问统计每次加载页面时更新</span>
-                <span class="lang-en">💡 Data provided by StatCounter real-time analytics | Visit stats update on each page load</span>
+                <span class="lang-cn">💡 数据由 Google Analytics 提供 | 每日自动更新 | 可能有 24-48 小时延迟</span>
+                <span class="lang-en">💡 Data powered by Google Analytics | Auto-updated daily | May have 24-48 hours delay</span>
             </small>
         </div>
     </div>

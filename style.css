@@ -530,55 +530,73 @@ footer p {
     font-style: italic;
 }
 
-/* StatCounter显示样式 */
-.statcounter-display {
+/* Google Analytics计数器样式 */
+.ga-counter-display {
     text-align: center;
     margin: 15px 0;
     padding: 15px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
     border-radius: 10px;
-    border: 1px solid #dee2e6;
+    border: 2px solid #28a745;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.counter-info {
-    margin-bottom: 10px;
+.ga-counter-display .counter-info {
+    margin-bottom: 8px;
     font-size: 1.1em;
-    color: #495057;
+    color: #155724;
     font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
-.counter-info .counter-number {
-    color: #007bff;
+.ga-counter-display .counter-number {
+    color: #28a745;
     font-size: 1.3em;
     font-weight: bold;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     padding: 3px 10px;
     border-radius: 20px;
-    border: 2px solid #007bff;
+    border: 2px solid #28a745;
     margin-left: 5px;
 }
 
-.statcounter-widget {
-    margin-top: 10px;
+.ga-counter-display .counter-status {
+    margin-top: 5px;
 }
 
-.statcounter-widget .statcounter {
-    display: inline-block;
-    padding: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
+.ga-counter-display .counter-status small {
+    color: #6f7745;
+    font-style: italic;
+    font-size: 0.8em;
 }
 
-.statcounter-widget img {
-    border-radius: 4px;
-    vertical-align: middle;
-    transition: transform 0.2s ease;
+/* 刷新按钮样式 */
+.refresh-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.statcounter-widget img:hover {
-    transform: scale(1.05);
+.refresh-btn:hover {
+    background: #218838;
+    transform: rotate(180deg);
+}
+
+.refresh-btn:active {
+    transform: scale(0.95) rotate(180deg);
 }
 
 /* 本地计数器样式 */

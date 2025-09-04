@@ -1,0 +1,144 @@
+
+/* --- 全局样式 --- */
+body {
+    /* ✒️ 修改：在字体列表中优先加入宋体，并微调了行高和字间距 */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 'SimSun', 'STSong', serif;
+    line-height: 1.7; /* 📏 调整：增加了行高 */
+    letter-spacing: 0.5px; /* 📏 调整：增加了字间距 */
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* ✨ 新增：为段落增加下边距，让段落感更清晰 */
+p {
+    margin-bottom: 1.2em;
+}
+
+/* --- 容器样式 --- */
+.container {
+    max-width: 960px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    border-radius: 8px;
+}
+
+/* --- 头部样式 --- */
+header {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    color: #2c3e50;
+}
+header .affiliation {
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 5px;
+}
+
+/* --- 主体布局 --- */
+.main-layout {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+.sidebar {
+    flex: 1;
+    min-width: 200px;
+}
+.profile-pic {
+    width: 100%;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+.sidebar h3 {
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 5px;
+    color: #2c3e50;
+}
+.contact-info ul, .links ul {
+    list-style-type: none;
+    padding: 0;
+}
+.contact-info li, .links li {
+    margin-bottom: 8px;
+}
+.contact-info a, .links a {
+    text-decoration: none;
+    color: #3498db;
+}
+.contact-info a:hover, .links a:hover {
+    text-decoration: underline;
+}
+.main-content {
+    flex: 3;
+}
+section {
+    margin-bottom: 30px;
+}
+h2 {
+    font-size: 1.8em;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+.publications-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+}
+.publications-list li {
+    margin-bottom: 15px;
+}
+.publications-list li strong {
+    color: #333;
+}
+.publications-list li em {
+    color: #555;
+}
+
+/* --- 页脚 --- */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    font-size: .9em;
+    color: #777;
+}
+
+/* --- 语言切换 --- */
+.lang-en { display: none; }
+.language-switcher {
+    margin-top: 15px;
+    font-size: .9em;
+}
+.language-switcher a {
+    text-decoration: none;
+    color: #777;
+    font-weight: 700;
+    padding: 3px 6px;
+}
+.language-switcher a.active {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+/* --- 响应式 --- */
+@media (max-width:768px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    .container {
+        margin: 0;
+        padding: 15px;
+        border-radius: 0;
+    }
+}

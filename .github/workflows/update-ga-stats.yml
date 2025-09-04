@@ -7,6 +7,10 @@ on:
   
   # 允许手动触发
   workflow_dispatch:
+  
+  # 允许外部webhook触发
+  repository_dispatch:
+    types: [update-ga-stats]
 
 # 设置权限
 permissions:

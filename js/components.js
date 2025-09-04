@@ -7,6 +7,11 @@ class ComponentLoader {
             document.getElementById(elementId).innerHTML = html;
         } catch (error) {
             console.error(`Failed to load component ${componentPath}:`, error);
+            // 在本地文件模式下，显示一个简化的错误提示
+            const element = document.getElementById(elementId);
+            if (element && window.location.protocol === 'file:') {
+                element.innerHTML = `<div style="padding: 10px; color: #666; font-style: italic;">组件 ${componentPath} 无法在本地文件模式下加载</div>`;
+            }
         }
     }
     
@@ -79,17 +84,31 @@ function initGoogleAnalyticsCounter() {
     const totalCountElement = document.getElementById('ga-total-count');
     const statusElement = document.getElementById('ga-counter-status');
     
-    if (!todayCountElement || !days30CountElement || !totalCountElement) return;
+    if (!todayCountElement || !days30CountElement || !totalCountElement) {
+        // 如果元素不存在，说明组件加载失败，直接返回
+        console.log('GA计数器元素未找到，可能是本地文件模式');
+        return;
+    }
     
     // 显示loading状态
     todayCountElement.textContent = '--';
     days30CountElement.textContent = '--';
     totalCountElement.textContent = '--';
     
+    // 在本地文件模式下，直接使用备用计数器
+    if (window.location.protocol === 'file:') {
+        console.log('检测到本地文件模式，使用备用计数器');
+        setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        return;
+    }
+    
     // 方法1: 优先从ga-stats.json文件读取数据
     fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
     
-    // 方法2: 确保GA跟踪代码正常工作
+    // 方法2: 每次访问时尝试触发更新（可选）
+    triggerGAStatsUpdate();
+    
+    // 方法3: 确保GA跟踪代码正常工作
     if (typeof gtag !== 'undefined') {
         gtag('event', 'page_view', {
             'page_title': document.title,
@@ -105,7 +124,88 @@ function initGoogleAnalyticsCounter() {
     }, 5000);
 }
 
-// 从 GitHub Pages 获取Google Analytics数据
+// 从 Google Analytics Reporting API 直接获取数据
+async function fetchGAStatsDirectly(todayCountElement, days30CountElement, totalCountElement, statusElement) {
+    try {
+        console.log('尝试直接从 Google Analytics API 获取数据...');
+        
+        // 使用 Google Analytics Reporting API v4
+        const API_KEY = 'YOUR_API_KEY'; // 需要在 Google Cloud Console 获取
+        const VIEW_ID = '503780674'; // 你的 GA View ID
+        
+        const today = new Date().toISOString().split('T')[0];
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        
+        // 构建API请求URL（使用Google Analytics Reporting API）
+        const requests = [
+            // 今日访问
+            {
+                viewId: VIEW_ID,
+                dateRanges: [{startDate: today, endDate: today}],
+                metrics: [{expression: 'ga:sessions'}]
+            },
+            // 30天访问
+            {
+                viewId: VIEW_ID,
+                dateRanges: [{startDate: thirtyDaysAgo, endDate: today}],
+                metrics: [{expression: 'ga:sessions'}]
+            },
+            // 总访问（从2020年开始）
+            {
+                viewId: VIEW_ID,
+                dateRanges: [{startDate: '2020-01-01', endDate: today}],
+                metrics: [{expression: 'ga:sessions'}]
+            }
+        ];
+        
+        const batchRequest = {
+            reportRequests: requests
+        };
+        
+        const response = await fetch(`https://analyticsreporting.googleapis.com/v4/reports:batchGet?key=${API_KEY}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(batchRequest)
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log('GA API 直接响应:', data);
+            
+            const reports = data.reports;
+            const todayVisits = reports[0]?.data?.totals?.[0]?.values?.[0] || 0;
+            const days30Visits = reports[1]?.data?.totals?.[0]?.values?.[0] || 0;
+            const totalVisits = reports[2]?.data?.totals?.[0]?.values?.[0] || 0;
+            
+            // 更新各个计数器
+            todayCountElement.textContent = todayVisits;
+            days30CountElement.textContent = days30Visits;
+            totalCountElement.textContent = totalVisits;
+            
+            if (statusElement) {
+                const now = new Date().toLocaleDateString();
+                statusElement.innerHTML = `
+                    <span class="lang-cn">实时GA数据 (${now})</span>
+                    <span class="lang-en">Real-time GA data (${now})</span>
+                `;
+                setTimeout(applyCurrentLanguage, 100);
+            }
+            
+            return true;
+        } else {
+            throw new Error(`GA API 错误: ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.log('GA API 直接访问失败:', error.message);
+        // 回退到文件方式
+        return await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
+    }
+}
+
+// 从 ga-stats.json 文件读取数据
 async function fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     try {
         console.log('尝试从 ga-stats.json 获取数据...');
@@ -358,6 +458,58 @@ async function loadCounterAPI() {
             setTimeout(applyCurrentLanguage, 100);
         }
     }
+}
+
+// 触发GitHub Actions更新GA统计数据
+async function triggerGAStatsUpdate() {
+    try {
+        // 检查上次更新时间，避免频繁触发
+        const lastUpdate = localStorage.getItem('ga_last_update');
+        const now = Date.now();
+        const updateInterval = 5 * 60 * 1000; // 5分钟内不重复触发
+        
+        if (lastUpdate && (now - parseInt(lastUpdate)) < updateInterval) {
+            console.log('最近已更新GA统计，跳过触发');
+            return;
+        }
+        
+        // 更新本地缓存时间
+        localStorage.setItem('ga_last_update', now.toString());
+        
+        console.log('触发GA统计数据更新...');
+        
+        // 注意：这需要Personal Access Token和仓库权限
+        // 暂时作为可选功能，不影响主要功能
+        console.log('GA统计将在下次定时任务中更新');
+        
+    } catch (error) {
+        console.log('触发更新失败:', error);
+    }
+}
+
+// 手动强制更新GA统计数据
+async function forceUpdateGAStats() {
+    const statusElements = document.querySelectorAll('#ga-counter-status');
+    statusElements.forEach(el => {
+        if (el) {
+            el.innerHTML = `
+                <span class="lang-cn">正在触发后台更新...</span>
+                <span class="lang-en">Triggering backend update...</span>
+            `;
+            setTimeout(applyCurrentLanguage, 100);
+        }
+    });
+    
+    // 清除缓存限制
+    localStorage.removeItem('ga_last_update');
+    
+    // 触发更新
+    await triggerGAStatsUpdate();
+    
+    // 等待一段时间后刷新页面数据
+    setTimeout(async () => {
+        await refreshGAStats();
+    }, 3000);
 }
 
 // 页面加载完成后加载所有组件

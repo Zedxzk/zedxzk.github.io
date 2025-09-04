@@ -79,35 +79,21 @@ def get_ga_stats():
             json.dump(stats, f, ensure_ascii=False, indent=2)
         
         print(f"数据已保存到 ga-stats.json")
-        return stats        # 如果没有数据行，创建空数据文件
-        if not response.rows:
-            print("今天暂无访问数据")
-            stats = {
-                "total_users": 0,
-                "today_views": 0,
-                "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "status": "no_data",
-                "data_source": "Google Analytics API",
-                "message": "今天暂无访问数据，可能需要等待数据处理"
-            }
-            
-            with open('ga-stats.json', 'w', encoding='utf-8') as f:
-                json.dump(stats, f, ensure_ascii=False, indent=2)
-            
-            print(f"空数据已保存到 ga-stats.json")
-            return stats
+        return stats
             
     except Exception as e:
         print(f"获取数据失败: {e}")
         
         # 即使出错也创建一个错误状态的JSON文件
         error_stats = {
-            "total_users": 0,
-            "today_views": 0,
+            "today_visits": 0,
+            "days30_visits": 0,
+            "total_visits": 0,
             "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "status": "error",
             "error": str(e),
             "data_source": "Google Analytics API",
+            "metric_type": "sessions",
             "message": "数据获取失败，请检查配置"
         }
         
@@ -140,9 +126,11 @@ if __name__ == "__main__":
     if result:
         print("\n📊 结果摘要:")
         print(f"   状态: {result.get('status', 'unknown')}")
-        print(f"   总访问量: {result.get('total_users', 0)}")
-        print(f"   今日访问: {result.get('today_views', 0)}")
+        print(f"   今日访问: {result.get('today_visits', 0)}")
+        print(f"   近30天访问: {result.get('days30_visits', 0)}")
+        print(f"   总访问量: {result.get('total_visits', 0)}")
         print(f"   更新时间: {result.get('last_updated', 'N/A')}")
+        print(f"   统计类型: {result.get('metric_type', 'sessions')}")
         
         if result.get('status') == 'success':
             print("✅ 数据获取成功！")

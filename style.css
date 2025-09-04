@@ -633,7 +633,7 @@ footer p {
 }
 
 /* 刷新按钮样式 */
-.refresh-btn {
+.refresh-btn, .update-btn {
     background: #28a745;
     color: white;
     border: none;
@@ -642,20 +642,24 @@ footer p {
     height: 28px;
     cursor: pointer;
     font-size: 12px;
-    margin-left: 8px;
+    margin: 0 3px;
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
 }
 
-.refresh-btn:hover {
+.refresh-btn:hover, .update-btn:hover {
     background: #218838;
-    transform: rotate(180deg);
+    transform: scale(1.1);
 }
 
-.refresh-btn:active {
-    transform: scale(0.95) rotate(180deg);
+.update-btn {
+    background: #fd7e14;
+}
+
+.update-btn:hover {
+    background: #e55a00;
 }
 
 /* 本地计数器样式 */

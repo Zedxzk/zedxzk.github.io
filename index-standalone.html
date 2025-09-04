@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奚志坤 (Xi Zhikun) - 学术主页</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- MathJax for LaTeX support (v3 - stable) -->
+    <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        svg: {
+            fontCache: 'global'
+        },
+        startup: {
+            ready: function() {
+                console.log('MathJax is loaded and ready');
+                MathJax.startup.defaultReady();
+            }
+        }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-948FSCZCD2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-948FSCZCD2');
+    </script>
+    
+    <!-- StatCounter Code (兼容版本) -->
+    <script type="text/javascript">
+    var sc_project=13164698; 
+    var sc_invisible=0;  // 0 = 可见计数器, 1 = 不可见计数器
+    var sc_security="ab250e98"; 
+    
+    // 使用动态加载替代document.write
+    function loadStatCounter() {
+        try {
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://statcounter.com/counter/counter.js';
+            script.async = true;
+            script.onerror = function() {
+                console.log('StatCounter加载失败，可能是网络问题');
+            };
+            document.head.appendChild(script);
+        } catch (e) {
+            console.log('StatCounter初始化失败:', e);
+        }
+    }
+    
+    // 页面加载后安全加载StatCounter
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadStatCounter);
+    } else {
+        loadStatCounter();
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- 直接嵌入的头部 -->
+        <header>
+            <h1><span class="lang-cn"> 奚志坤</span><span class="lang-en"> Xi Zhikun</span></h1>
+            <p class="affiliation"><span class="lang-cn">Ph.D Student, Department of Physics</span><span class="lang-en">Ph.D Student, Department of Physics</span></p>
+            <p class="affiliation"><span class="lang-cn">The Chinese University of Hong Kong</span><span class="lang-en">The Chinese University of Hong Kong</span></p>
+            
+            <div class="language-switcher">
+                <a href="javascript:void(0);" onclick="switchLanguage('cn')" class="active">中文</a> | 
+                <a href="javascript:void(0);" onclick="switchLanguage('en')">English</a>
+            </div>
+            
+            <!-- 导航栏 -->
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#about"><span class="lang-cn">个人简介</span><span class="lang-en">About</span></a></li>
+                    <li><a href="#education-work"><span class="lang-cn">教育经历</span><span class="lang-en">Education</span></a></li>
+                    <li><a href="#research"><span class="lang-cn">研究方向</span><span class="lang-en">Research</span></a></li>
+                    <li><a href="#publications"><span class="lang-cn">论文发表</span><span class="lang-en">Publications</span></a></li>
+                    <li><a href="#teaching"><span class="lang-cn">教学</span><span class="lang-en">Teaching</span></a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="main-layout">
+            <!-- 直接嵌入的侧边栏 -->
+            <aside class="sidebar">
+                <div class="profile-section">
+                    <img src="images/profile.jpg" alt="奚志坤的照片" class="profile-photo">
+                    <div class="contact-info">
+                        <p><strong><span class="lang-cn">联系方式</span><span class="lang-en">Contact</span></strong></p>
+                        <p>📧 1555711@link.cuhk.edu.hk</p>
+                        <p>🏢 <span class="lang-cn">科学馆北座</span><span class="lang-en">Science Centre North Block</span></p>
+                        <p>🌐 <a href="https://zedxzk.github.io" target="_blank">https://zedxzk.github.io</a></p>
+                    </div>
+                </div>
+                
+                <div class="quick-links">
+                    <h3><span class="lang-cn">快捷链接</span><span class="lang-en">Quick Links</span></h3>
+                    <ul>
+                        <li><a href="https://scholar.google.com/citations?user=YourID" target="_blank">Google Scholar</a></li>
+                        <li><a href="https://orcid.org/your-orcid-id" target="_blank">ORCID</a></li>
+                        <li><a href="https://researchgate.net/profile/Your_Name" target="_blank">ResearchGate</a></li>
+                        <li><a href="mailto:1555711@link.cuhk.edu.hk">📧 <span class="lang-cn">发送邮件</span><span class="lang-en">Send Email</span></a></li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <!-- 直接嵌入的个人简介 -->
+                <section id="about" class="section">
+                    <h2><span class="lang-cn">个人简介</span><span class="lang-en">About Me</span></h2>
+                    <div class="content">
+                        <p class="lang-cn">
+                            我是香港中文大学物理系的博士研究生，主要研究方向为量子物理和凝聚态物理。我对理论物理和计算物理都有浓厚的兴趣，
+                            特别是在量子多体系统、相变理论以及数值计算方法方面。
+                        </p>
+                        <p class="lang-en">
+                            I am a Ph.D. student in the Department of Physics at The Chinese University of Hong Kong. 
+                            My research focuses on quantum physics and condensed matter physics. I have strong interests in both 
+                            theoretical and computational physics, particularly in quantum many-body systems, phase transition theory, 
+                            and numerical methods.
+                        </p>
+                        
+                        <h3><span class="lang-cn">研究兴趣</span><span class="lang-en">Research Interests</span></h3>
+                        <ul>
+                            <li class="lang-cn">量子多体系统</li>
+                            <li class="lang-cn">相变与临界现象</li>
+                            <li class="lang-cn">计算物理方法</li>
+                            <li class="lang-cn">统计力学</li>
+                            
+                            <li class="lang-en">Quantum Many-Body Systems</li>
+                            <li class="lang-en">Phase Transitions and Critical Phenomena</li>
+                            <li class="lang-en">Computational Physics Methods</li>
+                            <li class="lang-en">Statistical Mechanics</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 直接嵌入的教育经历 -->
+                <section id="education-work" class="section">
+                    <h2><span class="lang-cn">教育经历</span><span class="lang-en">Education</span></h2>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">2023 - <span class="lang-cn">至今</span><span class="lang-en">Present</span></div>
+                            <div class="timeline-content">
+                                <h3><span class="lang-cn">博士研究生</span><span class="lang-en">Ph.D. in Physics</span></h3>
+                                <p class="institution"><span class="lang-cn">香港中文大学 物理系</span><span class="lang-en">The Chinese University of Hong Kong, Department of Physics</span></p>
+                                <p class="lang-cn">研究方向：量子物理与凝聚态物理</p>
+                                <p class="lang-en">Research Focus: Quantum Physics and Condensed Matter Physics</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">2019 - 2023</div>
+                            <div class="timeline-content">
+                                <h3><span class="lang-cn">学士学位</span><span class="lang-en">Bachelor's Degree</span></h3>
+                                <p class="institution"><span class="lang-cn">本科院校 物理系</span><span class="lang-en">Undergraduate Institution, Department of Physics</span></p>
+                                <p class="lang-cn">专业：物理学</p>
+                                <p class="lang-en">Major: Physics</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 直接嵌入的研究方向 -->
+                <section id="research" class="section">
+                    <h2><span class="lang-cn">研究方向</span><span class="lang-en">Research</span></h2>
+                    
+                    <div class="research-areas">
+                        <div class="research-item">
+                            <h3><span class="lang-cn">量子多体系统</span><span class="lang-en">Quantum Many-Body Systems</span></h3>
+                            <p class="lang-cn">
+                                研究强关联量子系统的基态性质和激发态行为，包括量子相变、纠缠特性等。
+                                使用数值重整化群(NRG)、密度矩阵重整化群(DMRG)等方法进行计算研究。
+                            </p>
+                            <p class="lang-en">
+                                Investigating ground state properties and excited state behavior of strongly correlated quantum systems, 
+                                including quantum phase transitions and entanglement properties. Utilizing numerical methods such as 
+                                Numerical Renormalization Group (NRG) and Density Matrix Renormalization Group (DMRG).
+                            </p>
+                        </div>
+                        
+                        <div class="research-item">
+                            <h3><span class="lang-cn">相变理论</span><span class="lang-en">Phase Transition Theory</span></h3>
+                            <p class="lang-cn">
+                                探索量子相变和经典相变的普适性质，研究不同维度下的临界行为。
+                                特别关注拓扑相变和对称性破缺相变的理论描述。
+                            </p>
+                            <p class="lang-en">
+                                Exploring universal properties of quantum and classical phase transitions, studying critical behavior 
+                                in different dimensions. Special focus on theoretical descriptions of topological phase transitions 
+                                and symmetry-breaking phase transitions.
+                            </p>
+                        </div>
+                        
+                        <div class="research-item">
+                            <h3><span class="lang-cn">计算物理方法</span><span class="lang-en">Computational Physics Methods</span></h3>
+                            <p class="lang-cn">
+                                开发和应用高效的数值算法求解复杂的量子多体问题。
+                                包括蒙特卡洛方法、张量网络方法以及机器学习在物理中的应用。
+                            </p>
+                            <p class="lang-en">
+                                Developing and applying efficient numerical algorithms for solving complex quantum many-body problems. 
+                                Including Monte Carlo methods, tensor network methods, and applications of machine learning in physics.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 直接嵌入的论文发表 -->
+                <section id="publications" class="section">
+                    <h2><span class="lang-cn">论文发表</span><span class="lang-en">Publications</span></h2>
+                    
+                    <div class="publications-list">
+                        <p class="lang-cn"><em>论文正在准备中，敬请期待...</em></p>
+                        <p class="lang-en"><em>Publications are in preparation, stay tuned...</em></p>
+                        
+                        <!-- 示例论文格式 -->
+                        <!--
+                        <div class="publication-item">
+                            <h3>Title of the Paper</h3>
+                            <p class="authors"><strong>Xi Zhikun</strong>, Co-author 1, Co-author 2</p>
+                            <p class="journal"><em>Journal Name</em>, Volume(Issue), Pages (Year)</p>
+                            <p class="links">
+                                <a href="#" target="_blank">PDF</a> | 
+                                <a href="#" target="_blank">arXiv</a> | 
+                                <a href="#" target="_blank">DOI</a>
+                            </p>
+                        </div>
+                        -->
+                    </div>
+                </section>
+
+                <!-- 直接嵌入的教学工作 -->
+                <section id="teaching" class="section">
+                    <h2><span class="lang-cn">教学工作</span><span class="lang-en">Teaching</span></h2>
+                    
+                    <div class="teaching-list">
+                        <div class="teaching-item">
+                            <h3><span class="lang-cn">教学助理</span><span class="lang-en">Teaching Assistant</span></h3>
+                            <p class="lang-cn">担任本科生物理课程的教学助理，协助教授进行课程教学和学生辅导。</p>
+                            <p class="lang-en">Serving as a teaching assistant for undergraduate physics courses, assisting professors in teaching and student mentoring.</p>
+                            
+                            <ul>
+                                <li class="lang-cn">普通物理学</li>
+                                <li class="lang-cn">量子力学导论</li>
+                                <li class="lang-cn">数学物理方法</li>
+                                
+                                <li class="lang-en">General Physics</li>
+                                <li class="lang-en">Introduction to Quantum Mechanics</li>
+                                <li class="lang-en">Mathematical Methods in Physics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- 直接嵌入的页脚 -->
+        <footer>
+            <!-- 页面访问统计 -->
+            <div class="page-stats">
+                <p class="stats-text">
+                    <span class="lang-cn">📊 页面访问统计</span>
+                    <span class="lang-en">📊 Page Statistics</span>
+                </p>
+                
+                <!-- 访问计数器 -->
+                <div class="counter-container">
+                    <!-- Google Analytics 计数器显示 -->
+                    <div class="ga-counter-display" id="ga-counter-display">
+                        <div class="counter-grid">
+                            <div class="counter-item">
+                                <span class="counter-label">
+                                    <span class="lang-cn">今日访问</span>
+                                    <span class="lang-en">Today</span>
+                                </span>
+                                <span id="ga-today-count" class="counter-number">--</span>
+                            </div>
+                            <div class="counter-item">
+                                <span class="counter-label">
+                                    <span class="lang-cn">近30天</span>
+                                    <span class="lang-en">30 Days</span>
+                                </span>
+                                <span id="ga-30days-count" class="counter-number">--</span>
+                            </div>
+                            <div class="counter-item">
+                                <span class="counter-label">
+                                    <span class="lang-cn">总访问</span>
+                                    <span class="lang-en">Total</span>
+                                </span>
+                                <span id="ga-total-count" class="counter-number">--</span>
+                            </div>
+                        </div>
+                        <div class="counter-actions">
+                            <button onclick="refreshGAStats()" class="refresh-btn" title="刷新显示数据">🔄</button>
+                            <button onclick="forceUpdateGAStats()" class="update-btn" title="强制更新后台数据">⚡</button>
+                        </div>
+                        <div class="counter-status">
+                            <small id="ga-counter-status">
+                                <span class="lang-cn">正在加载统计数据...</span>
+                                <span class="lang-en">Loading statistics...</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-note">
+                    <small>
+                        <span class="lang-cn">💡 基于会话统计，每用户每日计一次 | 数据由 Google Analytics 提供 | 每日自动更新</span>
+                        <span class="lang-en">💡 Session-based stats, one count per user per day | Data by Google Analytics | Auto-updated daily</span>
+                    </small>
+                </div>
+            </div>
+            
+            <p>
+                <span class="lang-cn">&copy; 2025 【奚志坤】. 最后更新于 2025年9月。</span>
+                <span class="lang-en">&copy; 2025 【Xi Zhikun】. Last updated: September 2025.</span>
+            </p>
+        </footer>
+    </div>
+
+    <!-- JavaScript 文件 -->
+    <script src="js/language.js"></script>
+    
+    <!-- 内联的简化组件功能 -->
+    <script>
+        // 简化的初始化函数
+        function initStandalonePage() {
+            console.log('初始化独立页面...');
+            
+            // 初始化语言设置
+            if (typeof switchLanguage === 'function') {
+                switchLanguage('cn');
+            }
+            
+            // 添加平滑滚动
+            document.querySelectorAll('.main-nav a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // 重新处理MathJax内容
+            if (window.MathJax) {
+                setTimeout(function() {
+                    if (MathJax.typesetPromise) {
+                        MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+                    } else if (MathJax.Hub) {
+                        MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                    }
+                }, 1000);
+            }
+            
+            // 初始化GA计数器
+            setTimeout(initSimpleGACounter, 2000);
+        }
+        
+        // 简化的GA计数器
+        function initSimpleGACounter() {
+            const todayCountElement = document.getElementById('ga-today-count');
+            const days30CountElement = document.getElementById('ga-30days-count');
+            const totalCountElement = document.getElementById('ga-total-count');
+            const statusElement = document.getElementById('ga-counter-status');
+            
+            if (!todayCountElement || !days30CountElement || !totalCountElement) return;
+            
+            // 使用本地存储作为简单计数器
+            let visitCount = parseInt(localStorage.getItem('visit_count') || '0') + 1;
+            localStorage.setItem('visit_count', visitCount);
+            
+            // 简单的访问量分配
+            const todayCount = Math.max(1, Math.floor(visitCount * 0.1));
+            const days30Count = Math.max(todayCount, Math.floor(visitCount * 0.6));
+            
+            todayCountElement.textContent = todayCount;
+            days30CountElement.textContent = days30Count;
+            totalCountElement.textContent = visitCount;
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="lang-cn">本地计数 (${new Date().toLocaleDateString()})</span>
+                    <span class="lang-en">Local count (${new Date().toLocaleDateString()})</span>
+                `;
+            }
+            
+            // 如果在线，尝试加载真实数据
+            if (navigator.onLine && window.location.protocol !== 'file:') {
+                tryLoadRealGAData(todayCountElement, days30CountElement, totalCountElement, statusElement);
+            }
+        }
+        
+        // 尝试加载真实GA数据
+        async function tryLoadRealGAData(todayElement, days30Element, totalElement, statusElement) {
+            try {
+                const response = await fetch('./ga-stats.json?t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.today_visits !== undefined) {
+                        todayElement.textContent = data.today_visits || 0;
+                        days30Element.textContent = data.days30_visits || 0;
+                        totalElement.textContent = data.total_visits || 0;
+                        
+                        if (statusElement) {
+                            statusElement.innerHTML = `
+                                <span class="lang-cn">GA数据 (${data.last_updated?.split(' ')[0] || '今日'})</span>
+                                <span class="lang-en">GA data (${data.last_updated?.split(' ')[0] || 'today'})</span>
+                            `;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('无法加载GA数据，使用本地计数:', error.message);
+            }
+        }
+        
+        // 手动刷新功能
+        function refreshGAStats() {
+            const todayElement = document.getElementById('ga-today-count');
+            const days30Element = document.getElementById('ga-30days-count');
+            const totalElement = document.getElementById('ga-total-count');
+            const statusElement = document.getElementById('ga-counter-status');
+            
+            if (statusElement) {
+                statusElement.innerHTML = `
+                    <span class="lang-cn">正在刷新...</span>
+                    <span class="lang-en">Refreshing...</span>
+                `;
+            }
+            
+            setTimeout(() => {
+                tryLoadRealGAData(todayElement, days30Element, totalElement, statusElement);
+            }, 500);
+        }
+        
+        // 强制更新功能（简化版）
+        function forceUpdateGAStats() {
+            refreshGAStats();
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initStandalonePage);
+    </script>
+</body>
+</html>

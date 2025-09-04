@@ -1,9 +1,0 @@
-{
-  "total_users": 0,
-  "today_views": 0,
-  "last_updated": "2025-09-04 16:33:04",
-  "status": "error",
-  "error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.",
-  "data_source": "Google Analytics API",
-  "message": "数据获取失败，请检查配置"
-}

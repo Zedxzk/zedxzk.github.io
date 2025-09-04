@@ -170,6 +170,10 @@ async function loadGistStats() {
                 const today = new Date().toISOString().split('T')[0];
                 const isNewDay = data.last_updated !== today;
                 
+                console.log('📝 开始更新访问计数...');
+                console.log('当前数据:', data);
+                console.log('是否新的一天:', isNewDay);
+                
                 data.total_visits = (data.total_visits || 0) + 1;
                 data.today_visits = isNewDay ? 1 : (data.today_visits || 0) + 1;
                 data.last_updated = today;
@@ -178,10 +182,23 @@ async function loadGistStats() {
                 if (!data.daily_stats) data.daily_stats = {};
                 data.daily_stats[today] = (data.daily_stats[today] || 0) + 1;
                 
-                console.log('访问计数已更新:', data);
+                console.log('✅ 本地计数更新成功:', {
+                    total_visits: data.total_visits,
+                    today_visits: data.today_visits,
+                    last_updated: data.last_updated
+                });
                 
-                // 这里可以添加将更新后的数据发送回Gist的逻辑
-                // 但由于CORS限制，我们只能本地模拟更新
+                // 尝试将更新后的数据写回Gist（实验性功能）
+                try {
+                    console.log('🔄 尝试写入Gist...');
+                    await updateGistData(data);
+                    console.log('✅ Gist写入成功！');
+                } catch (writeError) {
+                    console.log('❌ Gist写入失败:', writeError.message);
+                    console.log('⚠️ 无法更新访问统计到Gist，数据未保存');
+                }
+            } else {
+                console.log('🔄 重复访问，跳过计数更新');
             }
             
             // 更新显示
@@ -208,22 +225,61 @@ async function loadGistStats() {
     } catch (error) {
         console.log('Gist统计加载失败:', error.message);
         
-        // 使用模拟数据作为fallback
-        console.log('使用模拟数据...');
-        const mockData = getLocalVisitCount();
-        
-        counterElement.textContent = mockData.total_visits;
-        if (todayElement) {
-            todayElement.textContent = mockData.today_visits;
-        }
+        // 显示错误状态
+        counterElement.textContent = '--';
+        if (todayElement) todayElement.textContent = '--';
         
         if (statusElement) {
             statusElement.innerHTML = `
-                <span class="lang-cn">本地统计 (${mockData.last_updated})</span>
-                <span class="lang-en">Local stats (${mockData.last_updated})</span>
+                <span class="lang-cn">无法加载统计</span>
+                <span class="lang-en">Failed to load stats</span>
             `;
             setTimeout(applyCurrentLanguage, 100);
         }
+    }
+}
+
+// 尝试更新Gist数据（实验性功能）
+async function updateGistData(data) {
+    const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
+    
+    // 注意：由于没有GitHub token，这个功能只是演示
+    // 实际上无法写入到Gist，但会提供详细的调试信息
+    
+    console.log('🔍 准备写入的数据:', JSON.stringify(data, null, 2));
+    
+    // 模拟API调用（实际上会因为没有认证而失败）
+    try {
+        const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+            method: 'PATCH',
+            headers: {
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+                // 注意：这里没有Authorization header，所以会失败
+            },
+            body: JSON.stringify({
+                files: {
+                    'gistfile1.txt': {
+                        content: JSON.stringify(data, null, 2)
+                    }
+                }
+            })
+        });
+        
+        console.log('📡 Gist API响应状态:', response.status);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Gist更新成功!', result);
+            return true;
+        } else {
+            const errorText = await response.text();
+            console.log('❌ Gist API错误响应:', errorText);
+            throw new Error(`API错误: ${response.status} - ${errorText}`);
+        }
+    } catch (error) {
+        console.log('❌ Gist更新失败:', error.message);
+        throw error;
     }
 }
 
@@ -235,39 +291,12 @@ function checkAndUpdateVisit() {
     
     if (!hasVisitedToday) {
         sessionStorage.setItem(visitKey, 'true');
-        console.log('新访问，已计数');
+        console.log('🆕 新访问，已计数');
         return true;
     } else {
-        console.log('今天已访问过，跳过计数');
+        console.log('🔄 今天已访问过，跳过计数');
         return false;
     }
-}
-
-// 获取本地访问计数（fallback方案）
-function getLocalVisitCount() {
-    const today = new Date().toISOString().split('T')[0];
-    let stats = JSON.parse(localStorage.getItem('local_visit_stats') || '{}');
-    
-    // 初始化数据结构
-    if (!stats.total_visits) stats.total_visits = 0;
-    if (!stats.daily_stats) stats.daily_stats = {};
-    if (!stats.daily_stats[today]) stats.daily_stats[today] = 0;
-    
-    // 检查是否需要计数
-    if (checkAndUpdateVisit()) {
-        stats.total_visits++;
-        stats.daily_stats[today]++;
-        stats.last_updated = today;
-        
-        // 保存到localStorage
-        localStorage.setItem('local_visit_stats', JSON.stringify(stats));
-    }
-    
-    return {
-        total_visits: stats.total_visits,
-        today_visits: stats.daily_stats[today] || 0,
-        last_updated: stats.last_updated || today
-    };
 }
 
 // 页面加载完成后加载所有组件

@@ -116,19 +116,20 @@ async function loadGistStats() {
     if (!counterElement) return;
     
     try {
-        // 直接访问Gist原始内容URL，绕过API限制
+        // 使用CORS代理访问Gist原始内容
         const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
         const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        const PROXY_URL = `https://api.allorigins.win/get?url=${encodeURIComponent(RAW_URL)}`;
         
-        const response = await fetch(RAW_URL, {
+        const response = await fetch(PROXY_URL, {
             headers: {
-                'Accept': 'application/json',
-                'Cache-Control': 'no-cache'
+                'Accept': 'application/json'
             }
         });
         
         if (response.ok) {
-            const content = await response.text();
+            const result = await response.json();
+            const content = result.contents;
             
             if (content && content.trim()) {
                 const data = JSON.parse(content);
@@ -153,7 +154,7 @@ async function loadGistStats() {
                 throw new Error('Gist文件内容为空');
             }
         } else {
-            throw new Error(`Gist访问错误: ${response.status}`);
+            throw new Error(`代理访问错误: ${response.status}`);
         }
     } catch (error) {
         console.log('Gist统计加载失败:', error.message);

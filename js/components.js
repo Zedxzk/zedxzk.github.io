@@ -123,8 +123,8 @@ async function loadGistStats() {
         // 尝试多个CORS代理
         const proxies = [
             `https://corsproxy.io/?${encodeURIComponent(RAW_URL)}`,
-            `https://cors-anywhere.herokuapp.com/${RAW_URL}`,
-            `https://api.allorigins.win/get?url=${encodeURIComponent(RAW_URL)}`
+            `https://api.allorigins.win/get?url=${encodeURIComponent(RAW_URL)}`,
+            `https://cors-anywhere.herokuapp.com/${RAW_URL}`
         ];
         
         let data = null;
@@ -162,6 +162,28 @@ async function loadGistStats() {
         }
         
         if (data) {
+            // 检查是否需要计数（防重复访问）
+            const shouldCount = checkAndUpdateVisit();
+            
+            if (shouldCount) {
+                // 增加访问计数
+                const today = new Date().toISOString().split('T')[0];
+                const isNewDay = data.last_updated !== today;
+                
+                data.total_visits = (data.total_visits || 0) + 1;
+                data.today_visits = isNewDay ? 1 : (data.today_visits || 0) + 1;
+                data.last_updated = today;
+                
+                // 更新每日统计
+                if (!data.daily_stats) data.daily_stats = {};
+                data.daily_stats[today] = (data.daily_stats[today] || 0) + 1;
+                
+                console.log('访问计数已更新:', data);
+                
+                // 这里可以添加将更新后的数据发送回Gist的逻辑
+                // 但由于CORS限制，我们只能本地模拟更新
+            }
+            
             // 更新显示
             counterElement.textContent = data.total_visits || 0;
             if (todayElement) {
@@ -170,9 +192,10 @@ async function loadGistStats() {
             
             if (statusElement) {
                 const lastUpdated = data.last_updated || '未知';
+                const countStatus = shouldCount ? '已计数' : '重复访问';
                 statusElement.innerHTML = `
-                    <span class="lang-cn">Gist数据 (${lastUpdated})</span>
-                    <span class="lang-en">Gist data (${lastUpdated})</span>
+                    <span class="lang-cn">Gist数据 (${lastUpdated}) - ${countStatus}</span>
+                    <span class="lang-en">Gist data (${lastUpdated}) - ${shouldCount ? 'Counted' : 'Duplicate'}</span>
                 `;
                 setTimeout(applyCurrentLanguage, 100);
             }
@@ -187,11 +210,7 @@ async function loadGistStats() {
         
         // 使用模拟数据作为fallback
         console.log('使用模拟数据...');
-        const mockData = {
-            total_visits: 142,
-            today_visits: 3,
-            last_updated: '2025-09-04'
-        };
+        const mockData = getLocalVisitCount();
         
         counterElement.textContent = mockData.total_visits;
         if (todayElement) {
@@ -200,12 +219,55 @@ async function loadGistStats() {
         
         if (statusElement) {
             statusElement.innerHTML = `
-                <span class="lang-cn">演示数据 (${mockData.last_updated})</span>
-                <span class="lang-en">Demo data (${mockData.last_updated})</span>
+                <span class="lang-cn">本地统计 (${mockData.last_updated})</span>
+                <span class="lang-en">Local stats (${mockData.last_updated})</span>
             `;
             setTimeout(applyCurrentLanguage, 100);
         }
     }
+}
+
+// 检查并更新访问记录（防重复计数）
+function checkAndUpdateVisit() {
+    const today = new Date().toDateString();
+    const visitKey = 'page_visit_' + today;
+    const hasVisitedToday = sessionStorage.getItem(visitKey);
+    
+    if (!hasVisitedToday) {
+        sessionStorage.setItem(visitKey, 'true');
+        console.log('新访问，已计数');
+        return true;
+    } else {
+        console.log('今天已访问过，跳过计数');
+        return false;
+    }
+}
+
+// 获取本地访问计数（fallback方案）
+function getLocalVisitCount() {
+    const today = new Date().toISOString().split('T')[0];
+    let stats = JSON.parse(localStorage.getItem('local_visit_stats') || '{}');
+    
+    // 初始化数据结构
+    if (!stats.total_visits) stats.total_visits = 0;
+    if (!stats.daily_stats) stats.daily_stats = {};
+    if (!stats.daily_stats[today]) stats.daily_stats[today] = 0;
+    
+    // 检查是否需要计数
+    if (checkAndUpdateVisit()) {
+        stats.total_visits++;
+        stats.daily_stats[today]++;
+        stats.last_updated = today;
+        
+        // 保存到localStorage
+        localStorage.setItem('local_visit_stats', JSON.stringify(stats));
+    }
+    
+    return {
+        total_visits: stats.total_visits,
+        today_visits: stats.daily_stats[today] || 0,
+        last_updated: stats.last_updated || today
+    };
 }
 
 // 页面加载完成后加载所有组件

@@ -1,0 +1,123 @@
+name: Update Gist Visit Counter
+
+on:
+  # 当有人访问网站时触发（通过API调用）
+  repository_dispatch:
+    types: [visit_count, update_visitor_count]
+  
+  # 也可以手动触发
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'increment'
+        type: choice
+        options:
+        - increment
+        - reset
+
+jobs:
+  update-gist:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Update Gist
+      env:
+        GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        GIST_ID: f43cb9d745fd37f6403fdc480ffcdff8
+      run: |
+        # 获取今天的日期
+        TODAY=$(date -u +"%Y-%m-%d")
+        
+        # 下载当前Gist内容
+        echo "📥 获取当前Gist数据..."
+        curl -H "Authorization: token $GIST_TOKEN" \
+             -H "Accept: application/vnd.github.v3+json" \
+             "https://api.github.com/gists/$GIST_ID" > gist_response.json
+        
+        # 提取文件内容
+        CURRENT_DATA=$(cat gist_response.json | jq -r '.files["gistfile1.txt"].content')
+        echo "当前数据: $CURRENT_DATA"
+        
+        # 解析JSON数据
+        if [ "${{ github.event.event_type }}" = "update_visitor_count" ]; then
+          # 从client_payload获取数据
+          TOTAL_VISITS="${{ github.event.client_payload.total_visits }}"
+          TODAY_VISITS="${{ github.event.client_payload.today_visits }}"
+          LAST_UPDATED="${{ github.event.client_payload.last_updated }}"
+          
+          echo "📥 从Action payload获取数据:"
+          echo "总访问量: $TOTAL_VISITS"
+          echo "今日访问: $TODAY_VISITS"  
+          echo "最后更新: $LAST_UPDATED"
+          echo "触发时间: ${{ github.event.client_payload.trigger_time }}"
+          
+          # 直接使用payload数据
+          NEW_TOTAL_VISITS="$TOTAL_VISITS"
+          NEW_TODAY_VISITS="$TODAY_VISITS"
+          TODAY="$LAST_UPDATED"
+        else
+          # 传统增量更新方式
+          # 传统增量更新方式
+          TOTAL_VISITS=$(echo "$CURRENT_DATA" | jq -r '.total_visits // 0')
+          TODAY_VISITS=$(echo "$CURRENT_DATA" | jq -r '.today_visits // 0')
+          LAST_UPDATED=$(echo "$CURRENT_DATA" | jq -r '.last_updated // ""')
+          
+          echo "总访问量: $TOTAL_VISITS"
+          echo "今日访问: $TODAY_VISITS"
+          echo "最后更新: $LAST_UPDATED"
+          echo "今天日期: $TODAY"
+          
+          # 判断是否是新的一天
+          if [ "$LAST_UPDATED" != "$TODAY" ]; then
+            echo "🌅 新的一天，重置今日访问量"
+            NEW_TODAY_VISITS=1
+          else
+            echo "📈 同一天，增加今日访问量"
+            NEW_TODAY_VISITS=$((TODAY_VISITS + 1))
+          fi
+          
+          # 增加总访问量
+          NEW_TOTAL_VISITS=$((TOTAL_VISITS + 1))
+        fi
+        
+        # 构建新的JSON数据
+        NEW_DATA=$(jq -n \
+          --argjson total "$NEW_TOTAL_VISITS" \
+          --argjson today "$NEW_TODAY_VISITS" \
+          --arg date "$TODAY" \
+          '{
+            "total_visits": $total,
+            "today_visits": $today,
+            "last_updated": $date,
+            "daily_stats": {}
+          }')
+        
+        echo "🔄 更新后的数据: $NEW_DATA"
+        
+        # 更新Gist
+        echo "📤 上传更新到Gist..."
+        curl -X PATCH \
+             -H "Authorization: token $GIST_TOKEN" \
+             -H "Accept: application/vnd.github.v3+json" \
+             -H "Content-Type: application/json" \
+             "https://api.github.com/gists/$GIST_ID" \
+             -d "{
+               \"files\": {
+                 \"gistfile1.txt\": {
+                   \"content\": $(echo "$NEW_DATA" | jq -c .)
+                 }
+               }
+             }"
+        
+        echo "✅ Gist更新完成！"
+        echo "新的总访问量: $NEW_TOTAL_VISITS"
+        echo "新的今日访问量: $NEW_TODAY_VISITS"

@@ -188,13 +188,13 @@ async function loadGistStats() {
                     last_updated: data.last_updated
                 });
                 
-                // 触发GitHub Action更新Gist
+                // 尝试将更新后的数据写回Gist（实验性功能）
                 try {
-                    console.log('🚀 触发GitHub Action...');
-                    await triggerGitHubAction(data);
-                    console.log('✅ GitHub Action触发成功！');
-                } catch (actionError) {
-                    console.log('❌ GitHub Action触发失败:', actionError.message);
+                    console.log('🔄 尝试写入Gist...');
+                    await updateGistData(data);
+                    console.log('✅ Gist写入成功！');
+                } catch (writeError) {
+                    console.log('❌ Gist写入失败:', writeError.message);
                     console.log('⚠️ 无法更新访问统计到Gist，数据未保存');
                 }
             } else {
@@ -211,8 +211,8 @@ async function loadGistStats() {
                 const lastUpdated = data.last_updated || '未知';
                 const countStatus = shouldCount ? '已计数' : '重复访问';
                 statusElement.innerHTML = `
-                    <span class="lang-cn">GitHub Action (${lastUpdated}) - ${countStatus}</span>
-                    <span class="lang-en">GitHub Action (${lastUpdated}) - ${shouldCount ? 'Counted' : 'Duplicate'}</span>
+                    <span class="lang-cn">Gist数据 (${lastUpdated}) - ${countStatus}</span>
+                    <span class="lang-en">Gist data (${lastUpdated}) - ${shouldCount ? 'Counted' : 'Duplicate'}</span>
                 `;
                 setTimeout(applyCurrentLanguage, 100);
             }
@@ -239,66 +239,60 @@ async function loadGistStats() {
     }
 }
 
-// 触发GitHub Action更新Gist数据  
-async function triggerGitHubAction(data) {
-    console.log('🚀 触发GitHub Action更新Gist...');
-    console.log('📝 预期更新数据:', JSON.stringify(data, null, 2));
+// 尝试更新Gist数据
+async function updateGistData(data) {
+    const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
+    
+    console.log('🔍 准备写入的数据:', JSON.stringify(data, null, 2));
+    
+    // 从localStorage获取GitHub token
+    const GITHUB_TOKEN = localStorage.getItem('github_gist_token');
+    
+    if (!GITHUB_TOKEN) {
+        console.log('❌ 未找到GitHub token，无法写入Gist');
+        console.log('� 请在浏览器控制台运行以下命令设置token:');
+        console.log('localStorage.setItem("github_gist_token", "你的GitHub_token");');
+        throw new Error('缺少GitHub token认证');
+    }
     
     try {
-        // 使用repository_dispatch触发GitHub Action workflow
-        const response = await fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches', {
-            method: 'POST',
+        const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+            method: 'PATCH',
             headers: {
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json',
-                'Authorization': `token ${getGitHubToken()}`
+                'Authorization': `token ${GITHUB_TOKEN}`
             },
             body: JSON.stringify({
-                event_type: 'update_visitor_count',
-                client_payload: {
-                    total_visits: data.total_visits,
-                    today_visits: data.today_visits,
-                    last_updated: data.last_updated,
-                    daily_stats: data.daily_stats,
-                    trigger_time: new Date().toISOString(),
-                    user_agent: navigator.userAgent,
-                    referrer: document.referrer || 'direct',
-                    timestamp: Date.now()
+                files: {
+                    'gistfile1.txt': {
+                        content: JSON.stringify(data, null, 2)
+                    }
                 }
             })
         });
         
-        console.log('📡 GitHub Action触发状态:', response.status);
+        console.log('📡 Gist API响应状态:', response.status);
         
-        if (response.status === 204) {
-            console.log('✅ GitHub Action触发成功！');
-            console.log('⏳ Action将在后台更新Gist数据...');
-            console.log('🔄 预计1-2分钟后Gist数据将被更新');
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Gist更新成功!', result.updated_at);
             return true;
         } else {
             const errorText = await response.text();
-            console.log('❌ GitHub Action触发失败:', errorText);
-            throw new Error(`Action触发错误: ${response.status} - ${errorText}`);
+            console.log('❌ Gist API错误响应:', errorText);
+            
+            if (response.status === 401) {
+                console.log('🔐 token无效或过期，请重新设置');
+                localStorage.removeItem('github_gist_token');
+            }
+            
+            throw new Error(`API错误: ${response.status} - ${errorText}`);
         }
     } catch (error) {
-        console.log('❌ GitHub Action触发失败:', error.message);
-        console.log('💡 数据将仅在本地显示，无法保存到Gist');
-        // 不抛出错误，允许本地显示继续工作
-        return false;
+        console.log('❌ Gist更新失败:', error.message);
+        throw error;
     }
-}
-
-// 获取GitHub Token（需要有repo权限的token才能触发Actions）
-function getGitHubToken() {
-    // 优先从localStorage获取
-    const token = localStorage.getItem('github_gist_token');
-    if (!token) {
-        console.log('💡 需要设置GitHub token来触发Action:');
-        console.log('localStorage.setItem("github_gist_token", "your_github_token_with_repo_access");');
-        console.log('⚠️ Token需要有repo权限才能触发GitHub Actions');
-        throw new Error('需要具有repo权限的GitHub token才能触发Action');
-    }
-    return token;
 }
 
 // 检查并更新访问记录（防重复计数）

@@ -1,2 +1,0 @@
-google-analytics-data==0.18.2
-google-auth==2.23.4

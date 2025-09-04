@@ -140,6 +140,20 @@ header .affiliation {
     text-decoration: underline;
 }
 
+/* 链接图标已内置在HTML中，这里只需要调整样式 */
+.links a {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+    font-weight: 500;
+}
+
+.links a:hover {
+    color: #2980b9;
+    transform: translateX(2px);
+    transition: all 0.2s ease;
+}
+
 .main-content {
     flex: 3;
 }

@@ -94,15 +94,31 @@ function initGitHubCounter() {
                       window.location.port === '5500' ||
                       window.location.protocol === 'file:';
     
+    console.log(`🌍 环境检测: Vercel=${isVercelEnv}, GitHub=${isGitHubPages}, Local=${isLocalDev}`);
+    
     // Vercel 环境使用完整功能
     if (isVercelEnv) {
-        console.log('Vercel 环境，使用完整功能');
+        console.log('🚀 Vercel 环境，使用完整 API 功能');
         loadGistStats();
         return;
     }
     
-    // 其他环境使用免费计数器服务
-    console.log('使用免费访问计数器服务');
+    // GitHub Pages 环境使用免费计数器
+    if (isGitHubPages) {
+        console.log('📚 GitHub Pages 环境，使用免费计数器服务');
+        loadFreeCounterService();
+        return;
+    }
+    
+    // 本地开发环境
+    if (isLocalDev) {
+        console.log('💻 本地开发环境，使用本地存储计数器');
+        loadBasicCounter();
+        return;
+    }
+    
+    // 其他环境，默认使用免费服务
+    console.log('❓ 未知环境，使用免费计数器服务');
     loadFreeCounterService();
     
     console.log('访问计数器初始化完成');
@@ -146,8 +162,8 @@ function loadHitWebCounters() {
     const totalCounterContainer = document.getElementById('total-counter');
     const todayCounterContainer = document.getElementById('today-counter');
     
-    // 使用您的唯一页面ID（需要替换为实际ID）
-    const pageId = Math.random().toString(36).substr(2, 9); // 临时生成，实际使用时请使用固定ID
+    // 使用固定的页面ID（基于您的GitHub用户名）
+    const pageId = 'zedxzk_github_io';
     
     if (totalCounterContainer) {
         // 总访问量计数器
@@ -160,10 +176,11 @@ function loadHitWebCounters() {
             updateMainCounterFromImage(this, 'github-count');
         };
         totalCounterContainer.appendChild(totalImg);
+        console.log('📊 总访问量计数器已加载');
     }
     
     if (todayCounterContainer) {
-        // 今日访问量计数器（使用不同的页面ID来分别计数）
+        // 今日访问量计数器（使用日期后缀来分别计数）
         const todayImg = document.createElement('img');
         const today = new Date().toISOString().split('T')[0];
         todayImg.src = `https://hitwebcounter.com/counter/counter.php?page=${pageId}_${today}&style=0025&nbdigits=4&type=page&initCount=0`;
@@ -173,9 +190,10 @@ function loadHitWebCounters() {
             updateMainCounterFromImage(this, 'today-count');
         };
         todayCounterContainer.appendChild(todayImg);
+        console.log('📅 今日访问量计数器已加载');
     }
     
-    console.log('✅ HitWebCounter 计数器已加载');
+    console.log('✅ HitWebCounter 计数器已全部加载完成');
 }
 
 // 从计数器图片中提取数字并更新主显示（尝试OCR或估算）

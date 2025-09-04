@@ -14,44 +14,61 @@ def get_ga_stats():
     try:
         client = BetaAnalyticsDataClient()
 
-        # 获取所有时间的总访问量（使用 Google Analytics 支持的最大时间范围）
-        request_total = RunReportRequest(
-            property=f"properties/{PROPERTY_ID}",
-            metrics=[Metric(name="screenPageViews")],  # 页面浏览次数
-            date_ranges=[DateRange(start_date="2020-01-01", end_date="today")],  # 从GA4开始到现在
-        )
-
-        response_total = client.run_report(request_total)
-        
-        # 获取今日访问量
+        # 获取今日访问量（使用 sessions 而不是 pageviews，避免重复计算）
         request_today = RunReportRequest(
             property=f"properties/{PROPERTY_ID}",
-            metrics=[Metric(name="screenPageViews")],  # 页面浏览次数
+            metrics=[Metric(name="sessions")],  # 使用会话数，每个用户每天通常只算一次
             date_ranges=[DateRange(start_date="today", end_date="today")],
         )
 
         response_today = client.run_report(request_today)
 
-        # 处理总访问量数据
-        total_views = 0
-        if response_total.rows:
-            total_views = int(response_total.rows[0].metric_values[0].value)
-            print("所有时间总访问次数:", total_views)
-        
-        # 处理今日访问量数据
-        today_views = 0
+        # 获取近30天访问量
+        request_30days = RunReportRequest(
+            property=f"properties/{PROPERTY_ID}",
+            metrics=[Metric(name="sessions")],  # 使用会话数
+            date_ranges=[DateRange(start_date="30daysAgo", end_date="yesterday")],  # 不包括今天，避免重复
+        )
+
+        response_30days = client.run_report(request_30days)
+
+        # 获取所有时间总访问量
+        request_total = RunReportRequest(
+            property=f"properties/{PROPERTY_ID}",
+            metrics=[Metric(name="sessions")],  # 使用会话数
+            date_ranges=[DateRange(start_date="2020-01-01", end_date="today")],
+        )
+
+        response_total = client.run_report(request_total)
+
+        # 处理今日访问量
+        today_visits = 0
         if response_today.rows:
-            today_views = int(response_today.rows[0].metric_values[0].value)
-            print("今天的访问次数:", today_views)
+            today_visits = int(response_today.rows[0].metric_values[0].value)
+            print("今日访问量:", today_visits)
+        
+        # 处理30天访问量
+        days30_visits = 0
+        if response_30days.rows:
+            days30_visits = int(response_30days.rows[0].metric_values[0].value)
+            print("近30天访问量:", days30_visits)
+
+        # 处理总访问量
+        total_visits = 0
+        if response_total.rows:
+            total_visits = int(response_total.rows[0].metric_values[0].value)
+            print("所有时间总访问量:", total_visits)
 
         # 保存到 JSON 文件供前端使用
         stats = {
-            "total_users": total_views,  # 显示所有时间总访问量
-            "today_views": today_views,  # 今日访问量
-            "period": "所有时间",
+            "today_visits": today_visits,      # 今日访问量
+            "days30_visits": days30_visits,    # 近30天访问量（不包括今天）
+            "total_visits": total_visits,      # 所有时间总访问量
+            "period": "多时间段统计",
             "last_updated": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "status": "success",
-            "data_source": "Google Analytics API"
+            "data_source": "Google Analytics API",
+            "metric_type": "sessions"  # 说明使用的是会话数而不是页面浏览数
         }
         
         with open('ga-stats.json', 'w', encoding='utf-8') as f:

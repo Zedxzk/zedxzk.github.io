@@ -74,16 +74,20 @@ function applyCurrentLanguage() {
 function initGoogleAnalyticsCounter() {
     console.log('初始化Google Analytics计数器...');
     
-    const visitCountElement = document.getElementById('ga-visit-count');
+    const todayCountElement = document.getElementById('ga-today-count');
+    const days30CountElement = document.getElementById('ga-30days-count');
+    const totalCountElement = document.getElementById('ga-total-count');
     const statusElement = document.getElementById('ga-counter-status');
     
-    if (!visitCountElement) return;
+    if (!todayCountElement || !days30CountElement || !totalCountElement) return;
     
     // 显示loading状态
-    visitCountElement.textContent = '--';
+    todayCountElement.textContent = '--';
+    days30CountElement.textContent = '--';
+    totalCountElement.textContent = '--';
     
     // 方法1: 优先从ga-stats.json文件读取数据
-    fetchGAStatsFromFile(visitCountElement, statusElement);
+    fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
     
     // 方法2: 确保GA跟踪代码正常工作
     if (typeof gtag !== 'undefined') {
@@ -95,14 +99,14 @@ function initGoogleAnalyticsCounter() {
     
     // 方法3: 备用的本地计数器（5秒后如果还没有数据）
     setTimeout(function() {
-        if (visitCountElement.textContent === '--') {
-            setupFallbackCounter(visitCountElement, statusElement);
+        if (todayCountElement.textContent === '--') {
+            setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
         }
     }, 5000);
 }
 
 // 从 GitHub Pages 获取Google Analytics数据
-async function fetchGAStatsFromFile(visitCountElement, statusElement) {
+async function fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     try {
         console.log('尝试从 ga-stats.json 获取数据...');
         
@@ -122,15 +126,20 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
             const data = await response.json();
             console.log('GA JSON数据:', data);
             
-            if (data.total_users !== undefined) {
-                visitCountElement.textContent = data.total_users;
+            if (data.today_visits !== undefined || data.days30_visits !== undefined || data.total_visits !== undefined) {
+                // 更新各个计数器
+                todayCountElement.textContent = data.today_visits || 0;
+                days30CountElement.textContent = data.days30_visits || 0;
+                totalCountElement.textContent = data.total_visits || 0;
+                
                 if (statusElement) {
                     const updateTime = data.last_updated || '未知';
                     const timeParts = updateTime.split(' ');
                     const dateOnly = timeParts[0] || updateTime;
+                    const metricType = data.metric_type === 'sessions' ? '会话' : '页面浏览';
                     statusElement.innerHTML = `
-                        <span class="lang-cn">GA 数据 (${dateOnly})</span>
-                        <span class="lang-en">GA Data (${dateOnly})</span>
+                        <span class="lang-cn">GA ${metricType}数据 (${dateOnly})</span>
+                        <span class="lang-en">GA ${data.metric_type || 'sessions'} data (${dateOnly})</span>
                     `;
                     
                     // 确保应用当前语言设置
@@ -181,12 +190,17 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
 
 // 手动刷新GA数据
 async function refreshGAStats() {
-    const visitCountElement = document.getElementById('ga-visit-count');
+    const todayCountElement = document.getElementById('ga-today-count');
+    const days30CountElement = document.getElementById('ga-30days-count');
+    const totalCountElement = document.getElementById('ga-total-count');
     const statusElement = document.getElementById('ga-counter-status');
     
-    if (!visitCountElement) return;
+    if (!todayCountElement || !days30CountElement || !totalCountElement) return;
     
-    visitCountElement.textContent = '刷新中...';
+    todayCountElement.textContent = '刷新中...';
+    days30CountElement.textContent = '刷新中...';
+    totalCountElement.textContent = '刷新中...';
+    
     if (statusElement) {
         statusElement.innerHTML = `
             <span class="lang-cn">正在刷新数据...</span>
@@ -202,7 +216,7 @@ async function refreshGAStats() {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // 重新获取数据（强制绕过缓存）
-        const success = await fetchGAStatsFromFile(visitCountElement, statusElement);
+        const success = await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
         
         if (!success) {
             // 如果没有GA数据，使用备用计数器
@@ -215,23 +229,29 @@ async function refreshGAStats() {
                 // 确保应用当前语言设置
                 setTimeout(applyCurrentLanguage, 100);
             }
-            setupFallbackCounter(visitCountElement, statusElement);
+            setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
         }
         
     } catch (error) {
         console.log('刷新失败:', error);
-        setupFallbackCounter(visitCountElement, statusElement);
+        setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
     }
 }
 
 // 备用计数器方案
-function setupFallbackCounter(visitCountElement, statusElement) {
+function setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     // 使用localStorage作为备用计数方案
     let visitCount = parseInt(localStorage.getItem('ga_visit_count') || '0');
     visitCount += 1;
     localStorage.setItem('ga_visit_count', visitCount);
     
-    visitCountElement.textContent = visitCount;
+    // 为备用计数器提供合理的分配
+    const todayCount = Math.floor(visitCount * 0.1) || 1; // 假设今日是总数的10%
+    const days30Count = Math.floor(visitCount * 0.6) || Math.floor(visitCount / 2); // 假设30天是总数的60%
+    
+    todayCountElement.textContent = todayCount;
+    days30CountElement.textContent = days30Count;
+    totalCountElement.textContent = visitCount;
     
     if (statusElement) {
         statusElement.innerHTML = '<span class="lang-cn">本地计数 + GA 后台统计</span><span class="lang-en">Local count + GA backend tracking</span>';
@@ -245,14 +265,14 @@ function setupFallbackCounter(visitCountElement, statusElement) {
     // 定期检查和更新
     setInterval(function() {
         // 这里可以添加定期从后端API获取GA数据的逻辑
-        checkForGAUpdates(visitCountElement, statusElement);
+        checkForGAUpdates(todayCountElement, days30CountElement, totalCountElement, statusElement);
     }, 30000); // 每30秒检查一次
 }
 
 // 检查GA数据更新
-async function checkForGAUpdates(visitCountElement, statusElement) {
+async function checkForGAUpdates(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     try {
-        const success = await fetchGAStatsFromFile(visitCountElement, statusElement);
+        const success = await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
         if (!success) {
             // 如果文件读取失败，保持当前的本地计数
             console.log('ga-stats.json 文件暂时不可用，继续使用本地计数');

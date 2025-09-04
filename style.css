@@ -541,6 +541,65 @@ footer p {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* 计数器网格布局 */
+.counter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* 单个计数器项目 */
+.counter-item {
+    text-align: center;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.counter-label {
+    display: block;
+    font-size: 0.9em;
+    color: #155724;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.counter-item .counter-number {
+    color: #28a745;
+    font-size: 1.4em;
+    font-weight: bold;
+    display: block;
+}
+
+/* 操作按钮区域 */
+.counter-actions {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .counter-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .counter-item {
+        padding: 8px;
+    }
+    
+    .counter-label {
+        font-size: 0.85em;
+    }
+    
+    .counter-item .counter-number {
+        font-size: 1.2em;
+    }
+}
+
+/* 保留旧样式作为备用 */
 .ga-counter-display .counter-info {
     margin-bottom: 8px;
     font-size: 1.1em;

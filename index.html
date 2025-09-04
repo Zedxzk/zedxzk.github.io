@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>奚志坤 (Xi Zhikun) - 学术主页</title>
-    
     <link rel="stylesheet" href="style.css">
 </head>
+<script src="script.js"></script>
 <body>
     <div class="container">
         <header>
@@ -128,6 +128,11 @@ function switchLanguage(lang) {
         enLink.classList.add('active');
     }
 }
+
+// 页面加载时默认显示中文
+document.addEventListener('DOMContentLoaded', function() {
+    switchLanguage('cn');
+});
 </script>
 
 </body>

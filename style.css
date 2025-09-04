@@ -13,7 +13,7 @@ body {
 
 /* ✨ 新增：为段落增加下边距，让段落感更清晰 */
 p {
-    margin-bottom: 1.2em;
+    margin-bottom: 0.5em;
 }
 
 /* --- 容器样式 --- */
@@ -115,7 +115,6 @@ footer {
 }
 
 /* --- 语言切换 --- */
-.lang-en { display: none; }
 .language-switcher {
     margin-top: 15px;
     font-size: .9em;

@@ -190,7 +190,7 @@ async function loadGistStats() {
                 
                 // 触发GitHub Action更新Gist
                 try {
-                    console.log('🚀 准备触发GitHub Action...');
+                    console.log('🚀 准备触发GitHub Action (PAT方法)...');
                     console.log('📝 数据将发送到GitHub Action:', {
                         total_visits: data.total_visits,
                         today_visits: data.today_visits,
@@ -198,15 +198,17 @@ async function loadGistStats() {
                     });
                     
                     await triggerGitHubAction(data);
-                    console.log('✅ GitHub Action触发成功！数据将在后台更新');
+                    console.log('✅ GitHub Action触发流程完成！');
                 } catch (actionError) {
                     console.log('❌ GitHub Action触发失败:', actionError.message);
                     console.log('⚠️ 这不影响页面显示，计数仍会正常显示');
                     
-                    // 如果没有设置token，给出提示
-                    if (actionError.message.includes('GitHub token')) {
-                        console.log('🔧 要启用自动保存，请设置token:');
-                        console.log('localStorage.setItem("github_gist_token", "your_token_here");');
+                    // 给出设置提示
+                    if (actionError.message.includes('token')) {
+                        console.log('🔧 要启用自动保存，请按以下步骤设置:');
+                        console.log('1. 创建GitHub PAT (只需repo权限)');
+                        console.log('2. 设置: localStorage.setItem("gh_action_trigger_token", "your_token");');
+                        console.log('📖 详细说明请查看 SETUP_INSTRUCTIONS.md 文件');
                     }
                 }
             } else {
@@ -309,34 +311,69 @@ async function triggerGitHubAction(data) {
 
 // 通过GitHub Issues记录访问（无需认证的备用方案）
 async function recordVisitViaIssue(data) {
-    console.log('📝 记录访问 (无配置模式)...');
+    console.log('📝 触发GitHub Action (PAT方法)...');
     
     try {
-        // 方式1: 通过简单的网络请求记录访问痕迹
-        const requests = [
-            // GitHub API请求 (会在GitHub的访问日志中留下记录)
-            fetch(`https://api.github.com/repos/Zedxzk/zedxzk.github.io?_=${Date.now()}`, { 
-                method: 'HEAD',
-                cache: 'no-cache'
-            }).catch(() => {}),
+        // 使用您提供的方法：通过创建图片元素来触发repository_dispatch
+        const img = document.createElement('img');
+        img.style.display = 'none';
+        img.src = 'https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches';
+        
+        // 当图片加载失败时（这是预期的），触发fetch请求
+        img.onerror = function() {
+            fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'token ' + getActionTriggerToken(),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    event_type: 'update_visitor_count',
+                    client_payload: {
+                        total_visits: data.total_visits,
+                        today_visits: data.today_visits,
+                        last_updated: data.last_updated,
+                        daily_stats: data.daily_stats,
+                        trigger_time: new Date().toISOString(),
+                        user_agent: navigator.userAgent,
+                        referrer: document.referrer || 'direct'
+                    }
+                })
+            }).then(response => {
+                if (response.status === 204) {
+                    console.log('✅ GitHub Action触发成功 (PAT方法)！');
+                } else {
+                    console.log('❌ GitHub Action触发失败:', response.status);
+                }
+            }).catch(err => {
+                console.log('❌ 网络错误:', err.message);
+            });
             
-            // 访问GitHub Pages URL (会在访问统计中记录)
-            fetch(`https://zedxzk.github.io/ping?v=${data.total_visits}&t=${Date.now()}`, {
-                method: 'HEAD',
-                cache: 'no-cache'
-            }).catch(() => {})
-        ];
+            this.remove(); // 移除图片元素
+        };
         
-        await Promise.all(requests);
+        // 添加到页面以触发加载
+        document.body.appendChild(img);
         
-        console.log('✅ 访问记录已发送 (GitHub日志模式)');
-        console.log(`📊 总访问: ${data.total_visits}, 今日: ${data.today_visits}`);
-        
+        console.log('🚀 GitHub Action触发器已设置');
         return true;
+        
     } catch (error) {
-        console.log('📝 简单记录模式失败，转入GitHub Action模式');
+        console.log('📝 PAT触发失败，转入备用方案');
         throw error; // 让它转到GitHub Action方式
     }
+}
+
+// 获取Action触发器Token
+function getActionTriggerToken() {
+    // 从localStorage获取Action触发token
+    const token = localStorage.getItem('gh_action_trigger_token');
+    if (!token) {
+        console.log('💡 需要设置GitHub Action触发token:');
+        console.log('localStorage.setItem("gh_action_trigger_token", "your_repo_token_here");');
+        throw new Error('需要GitHub Action触发token');
+    }
+    return token;
 }
 
 // 获取GitHub Token（需要有repo权限的token才能触发Actions）

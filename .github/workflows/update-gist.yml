@@ -32,10 +32,14 @@ jobs:
     - name: Update Gist
       env:
         GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        GH_ACTION_TRIGGER_TOKEN: ${{ secrets.GH_ACTION_TRIGGER_TOKEN }}
         GIST_ID: f43cb9d745fd37f6403fdc480ffcdff8
       run: |
         # 获取今天的日期
         TODAY=$(date -u +"%Y-%m-%d")
+        
+        echo "🚀 GitHub Action触发 - 事件类型: ${{ github.event_name }}"
+        echo "📅 今天日期: $TODAY"
         
         # 下载当前Gist内容
         echo "📥 获取当前Gist数据..."
@@ -43,22 +47,29 @@ jobs:
              -H "Accept: application/vnd.github.v3+json" \
              "https://api.github.com/gists/$GIST_ID" > gist_response.json
         
+        # 检查API响应
+        if [ $? -ne 0 ]; then
+          echo "❌ 无法获取Gist数据"
+          exit 1
+        fi
+        
         # 提取文件内容
         CURRENT_DATA=$(cat gist_response.json | jq -r '.files["gistfile1.txt"].content')
-        echo "当前数据: $CURRENT_DATA"
+        echo "📊 当前数据: $CURRENT_DATA"
         
         # 解析JSON数据
         if [ "${{ github.event.event_type }}" = "update_visitor_count" ]; then
-          # 从client_payload获取数据
+          # 从client_payload获取数据 (PAT触发方式)
           TOTAL_VISITS="${{ github.event.client_payload.total_visits }}"
           TODAY_VISITS="${{ github.event.client_payload.today_visits }}"
           LAST_UPDATED="${{ github.event.client_payload.last_updated }}"
           
-          echo "📥 从Action payload获取数据:"
-          echo "总访问量: $TOTAL_VISITS"
-          echo "今日访问: $TODAY_VISITS"  
-          echo "最后更新: $LAST_UPDATED"
-          echo "触发时间: ${{ github.event.client_payload.trigger_time }}"
+          echo "📥 从PAT触发获取数据:"
+          echo "  总访问量: $TOTAL_VISITS"
+          echo "  今日访问: $TODAY_VISITS"  
+          echo "  最后更新: $LAST_UPDATED"
+          echo "  触发时间: ${{ github.event.client_payload.trigger_time }}"
+          echo "  用户代理: ${{ github.event.client_payload.user_agent }}"
           
           # 直接使用payload数据
           NEW_TOTAL_VISITS="$TOTAL_VISITS"
@@ -66,15 +77,14 @@ jobs:
           TODAY="$LAST_UPDATED"
         else
           # 传统增量更新方式
-          # 传统增量更新方式
           TOTAL_VISITS=$(echo "$CURRENT_DATA" | jq -r '.total_visits // 0')
           TODAY_VISITS=$(echo "$CURRENT_DATA" | jq -r '.today_visits // 0')
           LAST_UPDATED=$(echo "$CURRENT_DATA" | jq -r '.last_updated // ""')
           
-          echo "总访问量: $TOTAL_VISITS"
-          echo "今日访问: $TODAY_VISITS"
-          echo "最后更新: $LAST_UPDATED"
-          echo "今天日期: $TODAY"
+          echo "📈 传统模式数据:"
+          echo "  总访问量: $TOTAL_VISITS"
+          echo "  今日访问: $TODAY_VISITS"
+          echo "  最后更新: $LAST_UPDATED"
           
           # 判断是否是新的一天
           if [ "$LAST_UPDATED" != "$TODAY" ]; then

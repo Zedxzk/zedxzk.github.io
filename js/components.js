@@ -85,12 +85,20 @@ function initGitHubCounter() {
     
     if (!counterElement) return;
     
-    // 在本地开发模式下使用CORS代理
-    if (window.location.hostname === '127.0.0.1' || 
-        window.location.hostname === 'localhost' || 
-        window.location.port === '5500' ||
-        window.location.protocol === 'file:') {
-        console.log('本地开发模式，使用CORS代理方式');
+    // 检测环境类型
+    const isVercelEnv = window.location.hostname.includes('vercel.app') || 
+                       window.location.hostname.includes('vercel.dev');
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const isLocalDev = window.location.hostname === '127.0.0.1' || 
+                      window.location.hostname === 'localhost' || 
+                      window.location.port === '5500' ||
+                      window.location.protocol === 'file:';
+    
+    // 非 Vercel 环境使用 CORS 代理（只读模式）
+    if (isLocalDev || isGitHubPages || !isVercelEnv) {
+        const envName = isGitHubPages ? 'GitHub Pages' : 
+                       isLocalDev ? '本地开发' : '其他环境';
+        console.log(`${envName}模式，使用CORS代理方式（只读）`);
         counterElement.textContent = '...';
         if (todayElement) todayElement.textContent = '...';
         
@@ -402,9 +410,11 @@ async function loadGistStatsWithProxy() {
             }
             
             if (statusElement) {
+                const envInfo = window.location.hostname.includes('github.io') ? 
+                              'GitHub Pages' : '外部访问';
                 statusElement.innerHTML = `
-                    <span class="lang-cn">只读模式 (${data.last_updated})</span>
-                    <span class="lang-en">Read-only mode (${data.last_updated})</span>
+                    <span class="lang-cn">${envInfo} - 只读模式 (${data.last_updated})</span>
+                    <span class="lang-en">${envInfo} - Read-only mode (${data.last_updated})</span>
                 `;
                 setTimeout(applyCurrentLanguage, 100);
             }

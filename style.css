@@ -560,6 +560,130 @@ footer p {
     font-weight: 500;
 }
 
+/* 本地计数器样式 */
+.local-counter {
+    text-align: center;
+    margin: 15px 0;
+    padding: 12px;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border-radius: 10px;
+    border: 2px solid #f39c12;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.local-counter .counter-display {
+    font-size: 1em;
+    color: #8b4513;
+    font-weight: 600;
+}
+
+.local-counter .counter-number {
+    color: #e74c3c;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 15px;
+    border: 1px solid #f39c12;
+}
+
+/* 简易计数器样式 */
+.simple-counter {
+    text-align: center;
+    margin: 15px 0;
+    padding: 12px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    border-radius: 10px;
+    border: 2px solid #28a745;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.simple-counter .counter-display {
+    font-size: 1em;
+    color: #155724;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.fallback-counter {
+    text-align: center;
+}
+
+.fallback-counter img {
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 100%;
+    height: auto;
+}
+
+/* StatCounter备用方案样式 */
+.statcounter-fallback {
+    text-align: center;
+    margin: 15px 0;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.statcounter-fallback img {
+    border-radius: 6px;
+    vertical-align: middle;
+    transition: transform 0.2s ease;
+}
+
+.statcounter-fallback img:hover {
+    transform: scale(1.05);
+}
+
+.statcounter-fallback a {
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 8px;
+    color: #495057;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+/* GitHub计数器样式 */
+.github-counter {
+    text-align: center;
+    margin: 15px 0;
+    padding: 12px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-radius: 10px;
+    border: 2px solid #2196f3;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.github-counter .counter-display {
+    font-size: 1em;
+    color: #0d47a1;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.github-counter .counter-number {
+    color: #1565c0;
+    font-size: 1.2em;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 8px;
+    border-radius: 15px;
+    border: 1px solid #2196f3;
+}
+
+.counter-status {
+    margin-top: 5px;
+}
+
+.counter-status small {
+    color: #1976d2;
+    font-style: italic;
+    font-size: 0.8em;
+}
+
 /* 响应式调整 */
 @media (max-width: 768px) {
     .statcounter-display {

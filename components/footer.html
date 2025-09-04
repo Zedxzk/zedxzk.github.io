@@ -8,33 +8,42 @@
         
         <!-- 访问计数器 -->
         <div class="counter-container">
-            <!-- StatCounter 可见计数器 -->
-            <div class="statcounter-display">
-                <a href="https://statcounter.com/p13164698/?guest=1" target="_blank">
-                    <img src="https://c.statcounter.com/13164698/0/ab250e98/1/" 
-                         alt="StatCounter - Free Web Tracker and Counter" 
-                         style="border: 0;" />
-                </a>
+            <!-- 本地开发时的模拟计数器 -->
+            <div class="local-counter" id="local-counter" style="display: none;">
+                <div class="counter-display">
+                    <span class="lang-cn">本地测试模式 - 访问计数器: </span>
+                    <span class="lang-en">Local Test Mode - Visit Counter: </span>
+                    <span id="local-count" class="counter-number">1</span>
+                </div>
             </div>
             
-            <!-- 备用noscript版本 -->
-            <noscript>
-                <div class="statcounter">
-                    <a title="Web Analytics Made Easy - Statcounter" 
-                       href="https://statcounter.com/" target="_blank">
-                        <img class="statcounter" 
-                             src="https://c.statcounter.com/13164698/0/ab250e98/0/" 
-                             alt="Web Analytics Made Easy - Statcounter"
-                             referrerPolicy="no-referrer-when-downgrade">
-                    </a>
+            <!-- GitHub Pages 访问计数器 -->
+            <div class="github-counter" id="github-counter">
+                <div class="counter-display">
+                    <span class="lang-cn">页面访问量: </span>
+                    <span class="lang-en">Page Views: </span>
+                    <span id="github-count" class="counter-number">--</span>
                 </div>
-            </noscript>
+                <div class="counter-status">
+                    <small id="counter-status">
+                        <span class="lang-cn">正在加载...</span>
+                        <span class="lang-en">Loading...</span>
+                    </small>
+                </div>
+            </div>
         </div>
         
         <div class="stats-note">
             <small>
-                <span class="lang-cn">数据由计数器服务提供 | Google Analytics后台统计 | 计数器实时更新</span>
-                <span class="lang-en">Data provided by counter service | Google Analytics for detailed stats | Counter updates in real-time</span>
+                <span class="lang-cn">本地测试显示模拟数据 | 云端使用API+本地计数器 | Google Analytics后台分析</span>
+                <span class="lang-en">Local test shows simulated data | Cloud uses API+local counter | Google Analytics for detailed analysis</span>
+            </small>
+        </div>
+        
+        <div class="stats-note">
+            <small>
+                <span class="lang-cn">🔄 计数器原理：环境检测 → 数据存储 → 实时更新 | 技术栈：JavaScript + localStorage + API</span>
+                <span class="lang-en">🔄 Counter Logic: Environment Detection → Data Storage → Real-time Update | Tech: JavaScript + localStorage + API</span>
             </small>
         </div>
     </div>

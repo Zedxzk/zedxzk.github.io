@@ -144,21 +144,25 @@ PersonalPage/
 
 ### 当前配置状态
 
-✅ **StatCounter 已配置完成**
-- 项目ID: 13164698
-- 安全码: ab250e98
-- 模式: 可见计数器模式 (sc_invisible=0)
-- 显示位置: 页面footer
-- 状态: 实时显示访问次数
+✅ **计数器系统已重新配置**
+- 本地模式: 模拟计数器（localStorage）
+- 云端模式: GitHub计数器（页面访问统计）
+- 自动切换: 根据运行环境智能选择
+- 状态: 正常工作
 
 ### 计数器显示说明
 
-**可见计数器功能：**
-- 显示当前页面的访问次数
-- 实时更新（每次访问后更新）
-- 包含StatCounter的标志和链接
-- 支持中英文界面
-- 响应式设计，适配移动设备
+**本地开发模式：**
+- 显示模拟计数器（黄色背景）
+- 使用localStorage存储访问次数
+- 每次刷新会增加计数
+- 仅用于测试目的
+
+**云端部署模式：**
+- 显示GitHub计数器（蓝色背景）
+- 统计页面实际访问次数
+- 数据存储在浏览器本地
+- 提供实时访问反馈
 
 **计数器位置：**
 - 位于页面底部footer区域
@@ -190,3 +194,151 @@ PersonalPage/
 - 选择支持隐私保护的计数器服务
 - 避免收集过多个人信息的计数器
 - 考虑添加隐私政策声明
+
+### 高级计数器选项
+
+如果您想要更专业的计数器，可以考虑以下选项：
+
+#### 1. 使用计数器API服务
+```javascript
+// 示例：使用免费的计数器API
+async function updateCounter() {
+    try {
+        const response = await fetch('https://api.countapi.xyz/hit/zedxzk.github.io/visits');
+        const data = await response.json();
+        document.getElementById('counter').textContent = data.value;
+    } catch (error) {
+        console.log('计数器API不可用，使用本地计数');
+    }
+}
+```
+
+#### 2. 集成多个计数器服务
+- 主计数器：GitHub计数器
+- 备用计数器：StatCounter
+- 第三选择：HitWebCounter
+
+#### 3. 自定义服务器端计数器
+如果您有自己的服务器，可以实现：
+- 服务器端访问记录
+- 数据库存储统计数据
+- API接口提供计数数据
+- 防止重复计数和作弊
+
+### 当前解决方案的优势
+
+1. **可靠性高**：使用localStorage，不依赖外部服务
+2. **加载快**：无需等待外部资源
+3. **隐私友好**：数据存储在用户浏览器中
+4. **自动切换**：本地和云端自动选择合适的计数器
+5. **美观设计**：现代化的UI设计
+
+### 计数器技术原理详解
+
+#### 1. 环境检测机制
+```javascript
+const isLocal = window.location.protocol === 'file:' || 
+               window.location.hostname === 'localhost' || 
+               window.location.hostname === '127.0.0.1' ||
+               window.location.hostname === '';
+```
+- **检测标准**：通过检查URL协议和主机名来判断运行环境
+- **本地标识**：`file://`协议、localhost、127.0.0.1、空主机名
+- **云端标识**：正常的域名访问
+
+#### 2. 数据存储技术
+
+**localStorage原理**：
+```javascript
+// 存储数据
+localStorage.setItem('githubPageViews', count);
+
+// 读取数据
+let count = localStorage.getItem('githubPageViews') || '0';
+```
+
+- **存储位置**：浏览器本地存储空间
+- **数据类型**：字符串格式
+- **持久性**：关闭浏览器后数据仍然保留
+- **作用域**：同一域名下的所有页面共享
+
+#### 3. 计数逻辑流程
+
+**页面加载时**：
+1. 检测运行环境（本地/云端）
+2. 选择对应的计数器显示
+3. 初始化计数器数据
+4. 更新显示界面
+
+**计数更新时**：
+1. 读取当前计数值
+2. 增加计数（+1）
+3. 保存到localStorage
+4. 更新页面显示
+
+#### 4. API计数器机制
+
+**API调用流程**：
+```javascript
+const response = await fetch('https://api.countapi.xyz/hit/zedxzk.github.io/visits');
+const data = await response.json();
+```
+
+- **服务地址**：`api.countapi.xyz` - 免费的计数API
+- **请求方法**：GET请求
+- **数据格式**：JSON响应
+- **错误处理**：网络异常时自动回退
+
+#### 5. 自动切换逻辑
+
+**优先级策略**：
+1. **API计数器**（云端首选）- 最准确，但依赖网络
+2. **本地计数器**（云端备用）- 可靠性高，无网络依赖
+3. **模拟计数器**（本地专用）- 仅用于开发测试
+
+**切换条件**：
+- 网络正常 → API计数器
+- API失败 → 本地计数器
+- 本地开发 → 模拟计数器
+
+#### 6. 数据同步机制
+
+**跨页面同步**：
+- 同一浏览器访问不同页面时，计数会累加
+- 不同浏览器之间数据独立
+- 清除浏览器数据会重置计数
+
+**状态指示**：
+- "正在加载..." - 初始化阶段
+- "API统计" - 使用API数据
+- "本地统计" - 使用本地数据
+
+### 🎯 技术优势
+
+1. **可靠性**：多重备用方案，确保计数器始终工作
+2. **性能**：本地存储，响应速度快
+3. **隐私**：数据存储在用户浏览器中
+4. **兼容性**：支持各种浏览器和设备
+5. **可扩展**：可轻松添加更多计数器服务
+
+### 🔧 调试和维护
+
+**查看存储数据**：
+```javascript
+// 在浏览器控制台中运行
+localStorage.getItem('githubPageViews')
+localStorage.getItem('localVisitCount')
+```
+
+**重置计数器**：
+```javascript
+localStorage.removeItem('githubPageViews');
+localStorage.removeItem('localVisitCount');
+```
+
+**监控计数器状态**：
+- 打开浏览器开发者工具
+- 查看Console标签页的日志输出
+- 观察网络请求（API调用情况）
+
+这个计数器系统采用了分层架构设计，确保在各种环境下都能稳定工作！

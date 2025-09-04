@@ -72,3 +72,96 @@ PersonalPage/
 - 模块化版本需要通过HTTP服务器访问（不能直接双击打开文件）
 - 可以使用VS Code的Live Server扩展或其他本地服务器
 - 如果需要直接打开文件查看，可以使用原始的 `index.html`
+
+## Google Analytics 设置指南
+
+### 1. 创建 Google Analytics 账户
+1. 访问 [Google Analytics](https://analytics.google.com/)
+2. 使用您的Google账户登录
+3. 点击"开始测量"创建新账户
+4. 选择"网站"作为平台
+
+### 2. 获取测量ID
+1. 在GA4界面中，点击"管理" → "数据流"
+2. 点击您的网站数据流
+3. 复制"测量ID"（格式类似：G-XXXXXXXXXX）
+
+### 3. 配置网站
+1. 打开 `index.html` 文件
+2. 找到两处 `GA_MEASUREMENT_ID`
+3. 将其替换为您的实际测量ID
+4. 保存文件并提交到GitHub
+
+### 4. 验证安装
+1. 部署到GitHub Pages后访问网站
+2. 在GA4实时报告中查看访问数据
+3. 通常需要等待24-48小时才能看到完整统计数据
+
+### 统计功能说明
+- 页面访问量统计
+- 用户行为分析
+- 流量来源分析
+- 设备和浏览器统计
+- 地理位置分析
+
+### 注意事项
+- Google Analytics是免费的分析工具
+- 数据存储在Google服务器上，完全符合隐私政策
+- 支持实时数据查看和历史数据分析
+- 可以设置自定义事件跟踪（如按钮点击、表单提交等）
+
+## 免费计数器服务设置指南
+
+### 推荐计数器服务
+
+#### 1. StatCounter (推荐)
+1. 访问 [StatCounter](https://statcounter.com/)
+2. 免费注册账户
+3. 添加新项目，输入您的网站URL
+4. 选择计数器样式和位置
+5. 复制生成的HTML代码
+6. 替换 `footer.html` 中的计数器占位符
+
+#### 2. HitWebCounter
+1. 访问 [HitWebCounter](https://hitwebcounter.com/)
+2. 免费注册账户
+3. 创建新计数器
+4. 自定义样式和设置
+5. 获取计数器代码并替换
+
+#### 3. 其他选项
+- **Flag Counter**: 支持地理位置统计
+- **RevolverMaps**: 提供访客地图
+- **ClustrMaps**: 实时访客位置显示
+
+### 配置步骤
+
+1. **注册服务** - 选择一个免费计数器服务并注册
+2. **创建计数器** - 输入您的网站信息
+3. **获取代码** - 复制HTML代码并替换
+4. **替换代码** - 在 `footer.html` 中替换占位符
+5. **测试** - 访问网站验证计数器工作
+
+### 当前配置状态
+
+✅ **StatCounter 已配置完成**
+- 项目ID: 13164698
+- 安全码: ab250e98
+- 状态: 可见计数器模式
+- 集成位置: 页面footer
+
+### 示例代码格式
+
+```html
+<!-- 已配置的StatCounter代码 -->
+<script type="text/javascript">
+var sc_project=13164698; 
+var sc_invisible=0; 
+var sc_security="ab250e98";
+</script>
+```
+
+### 隐私考虑
+- 选择支持隐私保护的计数器服务
+- 避免收集过多个人信息的计数器
+- 考虑添加隐私政策声明

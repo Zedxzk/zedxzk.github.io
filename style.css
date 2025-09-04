@@ -402,27 +402,137 @@ mjx-chtml {
 /* --- 页脚 --- */
 footer {
     text-align: center;
-    margin-top: 30px;
-    padding-top: 20px;
+    padding: 20px;
+    margin-top: 40px;
     border-top: 1px solid #eee;
-    font-size: .9em;
-    color: #777;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
 }
 
-/* --- 语言切换 --- */
-.language-switcher {
-    margin-top: 15px;
-    font-size: .9em;
+/* 页面统计样式 */
+.page-stats {
+    margin-bottom: 15px;
 }
-.language-switcher a {
+
+.stats-text {
+    font-size: 1.1em;
+    color: #495057;
+    margin: 0;
+    font-weight: 500;
+}
+
+.stats-text span {
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.stats-text:hover span {
+    color: #007bff;
+}
+
+/* 版权信息样式 */
+footer p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* 统计说明样式 */
+.stats-note {
+    margin-top: 8px;
+}
+
+.stats-note small {
+    color: #868e96;
+    font-style: italic;
+}
+
+/* 计数器容器样式 */
+.counter-container {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.counter-display {
+    display: inline-block;
+    margin: 5px 15px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+.counter-number {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 1.1em;
+}
+
+/* HitWebCounter样式 */
+.hit-counter {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.hit-counter img {
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 计数器占位符样式 */
+.counter-placeholder {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+    margin: 10px 0;
+}
+
+.counter-number-display {
+    font-size: 1.1em;
+    color: #6c757d;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.counter-setup-note {
+    font-size: 0.85em;
+    color: #868e96;
+}
+
+.counter-setup-note small {
+    font-style: italic;
+}
+
+/* StatCounter显示样式 */
+.statcounter-display {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.statcounter {
+    display: inline-block;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.statcounter img {
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.statcounter a {
     text-decoration: none;
-    color: #777;
-    font-weight: 700;
-    padding: 3px 6px;
-}
-.language-switcher a.active {
-    color: #3498db;
-    text-decoration: underline;
+    color: #495057;
+    font-size: 0.85em;
+    display: inline-block;
+    margin-top: 5px;
 }
 
 /* --- 响应式 --- */
@@ -455,4 +565,140 @@ footer {
         width: 120px;
         height: 120px;
     }
+}
+
+/* --- Footer 样式 --- */
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 1px solid #eee;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+}
+
+/* 页面统计样式 */
+.page-stats {
+    margin-bottom: 15px;
+}
+
+.stats-text {
+    font-size: 1.1em;
+    color: #495057;
+    margin: 0;
+    font-weight: 500;
+}
+
+.stats-text span {
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.stats-text:hover span {
+    color: #007bff;
+}
+
+/* 版权信息样式 */
+footer p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+/* 统计说明样式 */
+.stats-note {
+    margin-top: 8px;
+}
+
+.stats-note small {
+    color: #868e96;
+    font-style: italic;
+}
+
+/* 计数器容器样式 */
+.counter-container {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.counter-display {
+    display: inline-block;
+    margin: 5px 15px;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 20px;
+    border: 1px solid #dee2e6;
+    font-size: 0.9em;
+    color: #495057;
+}
+
+.counter-number {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 1.1em;
+}
+
+/* HitWebCounter样式 */
+.hit-counter {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.hit-counter img {
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 计数器占位符样式 */
+.counter-placeholder {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+    margin: 10px 0;
+}
+
+.counter-number-display {
+    font-size: 1.1em;
+    color: #6c757d;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.counter-setup-note {
+    font-size: 0.85em;
+    color: #868e96;
+}
+
+.counter-setup-note small {
+    font-style: italic;
+}
+
+/* StatCounter显示样式 */
+.statcounter-display {
+    text-align: center;
+    margin: 10px 0;
+}
+
+.statcounter {
+    display: inline-block;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.statcounter img {
+    border-radius: 4px;
+    vertical-align: middle;
+}
+
+.statcounter a {
+    text-decoration: none;
+    color: #495057;
+    font-size: 0.85em;
+    display: inline-block;
+    margin-top: 5px;
 }

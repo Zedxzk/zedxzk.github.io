@@ -387,16 +387,39 @@ h2 {
 /* --- MathJax 样式 --- */
 mjx-container {
     font-size: 1.1em !important;
+    display: inline-block !important;
+    vertical-align: baseline !important;
 }
 
 mjx-chtml {
     font-size: inherit !important;
+    display: inline !important;
 }
 
 /* 确保数学公式在列表中的对齐 */
 .research-list li mjx-container {
     vertical-align: middle;
     margin-left: 5px;
+}
+
+/* MathJax 容器样式 */
+mjx-container[jax="SVG"] {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+mjx-container[jax="CHTML"] {
+    display: inline;
+    font-size: inherit;
+}
+
+/* 确保MathJax在所有元素中正确显示 */
+* mjx-container {
+    display: inline-block !important;
+}
+
+* mjx-chtml {
+    display: inline !important;
 }
 
 /* --- 页脚 --- */

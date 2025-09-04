@@ -6,15 +6,23 @@
     <title>奚志坤 (Xi Zhikun) - 学术主页</title>
     <link rel="stylesheet" href="style.css">
     
-    <!-- MathJax for LaTeX support -->
+    <!-- MathJax for LaTeX support (v3 - stable) -->
     <script>
-    MathJax = {
+    window.MathJax = {
         tex: {
             inlineMath: [['$', '$'], ['\\(', '\\)']],
-            displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true,
+            processEnvironments: true
         },
         svg: {
             fontCache: 'global'
+        },
+        startup: {
+            ready: function() {
+                console.log('MathJax is loaded and ready');
+                MathJax.startup.defaultReady();
+            }
         }
     };
     </script>

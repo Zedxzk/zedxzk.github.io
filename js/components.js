@@ -45,6 +45,17 @@ class ComponentLoader {
                 }
             });
         });
+        
+        // 重新处理MathJax内容
+        if (window.MathJax) {
+            setTimeout(function() {
+                if (MathJax.typesetPromise) {
+                    MathJax.typesetPromise();
+                } else if (MathJax.Hub) {
+                    MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                }
+            }, 100);
+        }
     }
 }
 

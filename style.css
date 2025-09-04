@@ -1,8 +1,8 @@
 
 /* --- 全局样式 --- */
 body {
-    /* ✒️ 修改：在字体列表中优先加入宋体，并微调了行高和字间距 */
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", 'SimSun', 'STSong', serif;
+    /* ✒️ 修改：在字体列表中优先加入楷体，并微调了行高和字间距 */
+    font-family: "SimSun", "STSong", "宋体", "KaiTi", "楷体", "STKaiti","Gorgia", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", serif;
     line-height: 1.7; /* 📏 调整：增加了行高 */
     letter-spacing: 0.5px; /* 📏 调整：增加了字间距 */
     margin: 0;
@@ -18,7 +18,7 @@ p {
 
 /* --- 容器样式 --- */
 .container {
-    max-width: 960px;
+    max-width: 1440px;
     margin: 20px auto;
     padding: 20px;
     background-color: #fff;
@@ -41,6 +41,46 @@ header .affiliation {
     font-size: 1.1em;
     color: #555;
     margin-top: 5px;
+}
+
+/* --- 导航栏样式 --- */
+.main-nav {
+    margin-top: 20px;
+}
+.main-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background-color: #f8f9fa;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.main-nav li {
+    flex: 1;
+}
+.main-nav a {
+    display: block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-right: 1px solid #e9ecef;
+}
+.main-nav li:last-child a {
+    border-right: none;
+}
+.main-nav a:hover {
+    background-color: #3498db;
+    color: white;
+    transform: translateY(-2px);
+}
+.main-nav a:active {
+    transform: translateY(0);
 }
 
 /* --- 主体布局 --- */
@@ -139,5 +179,19 @@ footer {
         margin: 0;
         padding: 15px;
         border-radius: 0;
+    }
+    
+    /* 导航栏响应式 */
+    .main-nav ul {
+        flex-direction: column;
+        border-radius: 10px;
+    }
+    .main-nav a {
+        border-right: none;
+        border-bottom: 1px solid #e9ecef;
+        padding: 15px 20px;
+    }
+    .main-nav li:last-child a {
+        border-bottom: none;
     }
 }

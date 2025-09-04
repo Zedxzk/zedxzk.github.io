@@ -6,134 +6,36 @@
     <title>奚志坤 (Xi Zhikun) - 学术主页</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<script src="script.js"></script>
 <body>
     <div class="container">
-        <header>
-            <h1><span class="lang-cn"> 奚志坤</span><span class="lang-en"> Xi Zhikun</span></h1>
-            <p class="affiliation"><span class="lang-cn">Ph.D Student, Department of Physics</span><span class="lang-en">Ph.D Student, Department of Physics</span></p>
-            <p class="affiliation"><span class="lang-cn">The Chinese University of Hong Kong</span><span class="lang-en">The Chinese University of Hong Kong</span></p>
-            
-            <div class="language-switcher">
-                <a href="javascript:void(0);" onclick="switchLanguage('cn')" class="active">中文</a> | 
-                <a href="javascript:void(0);" onclick="switchLanguage('en')">English</a>
-            </div>
-        </header>
+        <!-- 头部组件容器 -->
+        <div id="header-container"></div>
 
         <div class="main-layout">
-            <aside class="sidebar">
-                <img src="profile.jpg" alt="Profile Photo" class="profile-pic">
-
-                <div class="contact-info">
-                    <h3><span class="lang-cn">联系方式</span><span class="lang-en">Contact</span></h3>
-                    <ul>
-                        <li><span class="lang-cn">📧 邮箱:</span><span class="lang-en">📧 Email:</span> <a href="mailto:your.email@example.com">your.email@example.com</a></li>
-                        <li><span class="lang-cn">🏠 办公室:</span><span class="lang-en">🏠 Office:</span> <span class="lang-cn">【你的办公室地址】</span><span class="lang-en">Your Office Address</span></li>
-                    </ul>
-                </div>
-
-                <div class="links">
-                    <h3><span class="lang-cn">相关链接</span><span class="lang-en">Links</span></h3>
-                    <ul>
-                        <li><a href="#" target="_blank">CV</a></li>
-                        <li><a href="#" target="_blank">Google Scholar</a></li>
-                        <li><a href="#" target="_blank">GitHub</a></li>
-                        <li><a href="#" target="_blank">LinkedIn</a></li>
-                    </ul>
-                </div>
-            </aside>
+            <!-- 侧边栏组件容器 -->
+            <div id="sidebar-container"></div>
 
             <main class="main-content">
-                <section id="about">
-                    <h2><span class="lang-cn">关于我</span><span class="lang-en">About Me</span></h2>
-                    <p>
-                        <span class="lang-cn">在这里写一段关于你自己的中文介绍。例如：我目前是【你的大学】【你的院系】的一名【你的职称】。我的研究兴趣主要集中在【领域一】、【领域二】和【领域三】。我于【年份】在【授予博士学位的大学】获得博士学位。</span>
-                        <span class="lang-en">Write a brief introduction about yourself in English here. For example: I am currently a [Your Title] at the [Your Department], [Your University]. My research interests focus on [Area 1], [Area 2], and [Area 3]. I received my Ph.D. from [Your Ph.D. University] in [Year].</span>
-                    </p>
-                </section>
-
-                <section id="research">
-                    <h2><span class="lang-cn">研究方向</span><span class="lang-en">Research Interests</span></h2>
-                    <ul>
-                        <li><span class="lang-cn">机器学习</span><span class="lang-en">Machine Learning</span></li>
-                        <li><span class="lang-cn">自然语言处理</span><span class="lang-en">Natural Language Processing</span></li>
-                        <li><span class="lang-cn">计算机视觉</span><span class="lang-en">Computer Vision</span></li>
-                    </ul>
-                </section>
-
-                <section id="publications">
-                    <h2><span class="lang-cn">发表论文</span><span class="lang-en">Publications</span></h2>
-                    <p>
-                        <span class="lang-cn">（* 代表通讯作者, † 代表同等贡献）</span>
-                        <span class="lang-en">(* Corresponding author, † Equal contribution)</span>
-                    </p>
-                    <ol class="publications-list">
-                        <li>
-                            <strong>Paper Title 1</strong><br>
-                            Author A, <strong>Your Name</strong>*, Author B.<br>
-                            <em>Journal or Conference Name</em>, 2025. <br>
-                            [<a href="#">PDF</a>] [<a href="#">Code</a>] [<a href="#">Cite</a>]
-                        </li>
-                        <li>
-                            <strong>Paper Title 2</strong><br>
-                            Author C†, <strong>Your Name</strong>†, Author D.<br>
-                            <em>Journal or Conference Name</em>, 2024. <br>
-                            [<a href="#">PDF</a>] [<a href="#">Code</a>] [<a href="#">Cite</a>]
-                        </li>
-                    </ol>
-                </section>
+                <!-- 关于我组件容器 -->
+                <div id="about-container"></div>
                 
-                <section id="teaching">
-                    <h2><span class="lang-cn">教学</span><span class="lang-en">Teaching</span></h2>
-                    <ul>
-                        <li>
-                            <span class="lang-cn">课程名称一 (2025年秋季)</span>
-                            <span class="lang-en">Course Name One (Fall 2025)</span>
-                        </li>
-                        <li>
-                            <span class="lang-cn">课程名称二 (2025年春季)</span>
-                            <span class="lang-en">Course Name Two (Spring 2025)</span>
-                        </li>
-                    </ul>
-                </section>
+                <!-- 研究方向组件容器 -->
+                <div id="research-container"></div>
+                
+                <!-- 发表论文组件容器 -->
+                <div id="publications-container"></div>
+                
+                <!-- 教学组件容器 -->
+                <div id="teaching-container"></div>
             </main>
         </div>
 
-        <footer>
-            <p>
-                <span class="lang-cn">&copy; 2025 【你的名字】. 最后更新于 2025年9月。</span>
-                <span class="lang-en">&copy; 2025 Your Name. Last updated: September 2025.</span>
-            </p>
-        </footer>
+        <!-- 页脚组件容器 -->
+        <div id="footer-container"></div>
     </div>
 
-<script>
-function switchLanguage(lang) {
-    const cnElements = document.querySelectorAll('.lang-cn');
-    const enElements = document.querySelectorAll('.lang-en');
-    const cnLink = document.querySelector('.language-switcher a[onclick="switchLanguage(\'cn\')"]');
-    const enLink = document.querySelector('.language-switcher a[onclick="switchLanguage(\'en\')"]');
-
-    if (lang === 'cn') {
-        cnElements.forEach(el => el.style.display = '');
-        enElements.forEach(el => el.style.display = 'none');
-        document.documentElement.lang = 'zh-CN';
-        cnLink.classList.add('active');
-        enLink.classList.remove('active');
-    } else {
-        cnElements.forEach(el => el.style.display = 'none');
-        enElements.forEach(el => el.style.display = '');
-        document.documentElement.lang = 'en';
-        cnLink.classList.remove('active');
-        enLink.classList.add('active');
-    }
-}
-
-// 页面加载时默认显示中文
-document.addEventListener('DOMContentLoaded', function() {
-    switchLanguage('cn');
-});
-</script>
-
+    <!-- JavaScript 文件 -->
+    <script src="js/language.js"></script>
+    <script src="js/components.js"></script>
 </body>
 </html>

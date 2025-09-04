@@ -57,10 +57,63 @@ class ComponentLoader {
             }, 100);
         }
         
-        // 本地开发模式检测
+        // 初始化StatCounter计数器显示
         setTimeout(function() {
-            checkLocalDevelopmentMode();
+            initStatCounterDisplay();
         }, 2000);
+    }
+}
+
+// StatCounter 计数器显示和数据提取
+function initStatCounterDisplay() {
+    console.log('初始化StatCounter显示...');
+    
+    // 等待StatCounter脚本加载
+    setTimeout(function() {
+        extractStatCounterData();
+    }, 3000);
+    
+    // 设置定期检查
+    setInterval(function() {
+        extractStatCounterData();
+    }, 10000); // 每10秒检查一次
+}
+
+// 从StatCounter提取访问数据
+function extractStatCounterData() {
+    const visitCountElement = document.getElementById('visit-count');
+    if (!visitCountElement) return;
+    
+    try {
+        // 方法1: 尝试从StatCounter的全局变量获取数据
+        if (window.sc_counter_data) {
+            visitCountElement.textContent = window.sc_counter_data.count || '--';
+            console.log('从StatCounter全局变量获取数据:', window.sc_counter_data.count);
+            return;
+        }
+        
+        // 方法2: 尝试从StatCounter的img元素获取数据
+        const statcounterImg = document.querySelector('.statcounter img');
+        if (statcounterImg && statcounterImg.src) {
+            // 从图片URL中提取计数信息
+            const urlMatch = statcounterImg.src.match(/\/(\d+)\/[^\/]*$/);
+            if (urlMatch && urlMatch[1]) {
+                visitCountElement.textContent = urlMatch[1];
+                console.log('从StatCounter图片URL提取数据:', urlMatch[1]);
+                return;
+            }
+        }
+        
+        // 方法3: 使用本地存储作为备用方案
+        let localCount = parseInt(localStorage.getItem('statcounter_visits') || '0');
+        localCount += 1;
+        localStorage.setItem('statcounter_visits', localCount);
+        visitCountElement.textContent = localCount;
+        console.log('使用本地存储计数:', localCount);
+        
+    } catch (error) {
+        console.log('StatCounter数据提取失败:', error);
+        visitCountElement.textContent = '--';
     }
 }
 
@@ -122,79 +175,6 @@ async function loadCounterAPI() {
         }
     }
 }
-
-// 改进的本地开发模式检测
-function checkLocalDevelopmentMode() {
-    const isLocal = window.location.protocol === 'file:' || 
-                   window.location.hostname === 'localhost' || 
-                   window.location.hostname === '127.0.0.1' ||
-                   window.location.hostname === '';
-    
-    const localCounter = document.getElementById('local-counter');
-    const githubCounter = document.getElementById('github-counter');
-    
-    if (isLocal && localCounter) {
-        // 本地模式：显示模拟计数器
-        localCounter.style.display = 'block';
-        if (githubCounter) githubCounter.style.display = 'none';
-        
-        // 简单的本地计数器逻辑
-        let count = parseInt(localStorage.getItem('localVisitCount') || '0') + 1;
-        localStorage.setItem('localVisitCount', count);
-        document.getElementById('local-count').textContent = count;
-        
-        console.log('本地开发模式：显示模拟计数器，当前访问次数：', count);
-    } else {
-        // 云端模式：显示GitHub计数器
-        if (githubCounter) githubCounter.style.display = 'block';
-        if (localCounter) localCounter.style.display = 'none';
-        
-        // 初始化GitHub计数器
-        initGitHubCounter();
-        
-        console.log('云端模式：显示GitHub访问计数器');
-    }
-}
-
-// 计数器状态监控（可选，用于调试）
-function monitorCounterStatus() {
-    const status = {
-        environment: 'unknown',
-        storage: 'unknown',
-        api: 'unknown',
-        counter: 'unknown'
-    };
-    
-    // 检测环境
-    if (window.location.protocol === 'file:') {
-        status.environment = 'local-file';
-    } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        status.environment = 'local-server';
-    } else {
-        status.environment = 'cloud';
-    }
-    
-    // 检测存储
-    try {
-        localStorage.setItem('test', 'test');
-        localStorage.removeItem('test');
-        status.storage = 'available';
-    } catch (e) {
-        status.storage = 'unavailable';
-    }
-    
-    // 检测计数器
-    const counterElement = document.getElementById('github-count');
-    if (counterElement) {
-        status.counter = counterElement.textContent;
-    }
-    
-    console.log('计数器状态监控:', status);
-    return status;
-}
-
-// 在控制台中可以调用此函数查看状态
-window.checkCounterStatus = monitorCounterStatus;
 
 // 页面加载完成后加载所有组件
 document.addEventListener('DOMContentLoaded', function() {

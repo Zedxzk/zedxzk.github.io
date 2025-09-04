@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>访问计数器测试</title>
+</head>
+<body>
+    <h1>访问计数器测试页面</h1>
+    
+    <div>
+        <h2>第一步：设置GitHub PAT Token</h2>
+        <p>在浏览器控制台运行以下命令：</p>
+        <pre>localStorage.setItem("gh_action_trigger_token", "your_github_pat_token_here");</pre>
+        
+        <h2>第二步：测试触发</h2>
+        <button onclick="testTrigger()">测试GitHub Action触发</button>
+        
+        <h2>第三步：查看日志</h2>
+        <p>打开浏览器控制台查看详细日志信息</p>
+    </div>
+
+    <script>
+        function testTrigger() {
+            console.log('🧪 开始测试GitHub Action触发...');
+            
+            try {
+                const token = localStorage.getItem('gh_action_trigger_token');
+                if (!token) {
+                    console.error('❌ 未找到token，请先设置：');
+                    console.log('localStorage.setItem("gh_action_trigger_token", "your_token_here");');
+                    return;
+                }
+                
+                console.log('✅ Token已设置，准备触发...');
+                
+                // 创建测试数据
+                const testData = {
+                    total_visits: 999,
+                    today_visits: 1,
+                    last_updated: new Date().toISOString().split('T')[0],
+                    daily_stats: {}
+                };
+                
+                // 触发GitHub Action
+                fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io/dispatches', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'token ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        event_type: 'update_visitor_count',
+                        client_payload: {
+                            ...testData,
+                            trigger_time: new Date().toISOString(),
+                            user_agent: navigator.userAgent,
+                            referrer: 'test-page'
+                        }
+                    })
+                }).then(response => {
+                    console.log('📡 响应状态:', response.status);
+                    if (response.status === 204) {
+                        console.log('✅ GitHub Action触发成功！');
+                        console.log('🔄 请检查GitHub Actions页面确认workflow运行');
+                    } else {
+                        console.error('❌ 触发失败，状态码:', response.status);
+                    }
+                }).catch(error => {
+                    console.error('❌ 网络错误:', error);
+                });
+                
+            } catch (error) {
+                console.error('❌ 测试失败:', error);
+            }
+        }
+        
+        // 页面加载时检查token状态
+        window.onload = function() {
+            const token = localStorage.getItem('gh_action_trigger_token');
+            if (token) {
+                console.log('✅ GitHub PAT Token已设置');
+                console.log('Token前缀:', token.substring(0, 8) + '...');
+            } else {
+                console.log('⚠️ 未设置GitHub PAT Token');
+            }
+        };
+    </script>
+</body>
+</html>

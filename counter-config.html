@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>免费访问计数器配置 - 总访问量 + 今日访问量</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .demo-section {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .counter-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .counter-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .counter-label {
+            display: block;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        .counter-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+            display: block;
+            margin: 10px 0;
+        }
+        .counter-image {
+            margin-top: 10px;
+        }
+        .code-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background: #263238;
+            color: #ffffff;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .service-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .service-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .service-card h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .highlight {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .setup-steps {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .config-form {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-success {
+            background: #28a745;
+        }
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 免费访问计数器 - 总访问量 + 今日访问量</h1>
+        
+        <div class="highlight">
+            <h3>🎯 功能特点</h3>
+            <ul>
+                <li>✅ <strong>总访问量统计</strong>：累计所有访问次数</li>
+                <li>✅ <strong>今日访问量统计</strong>：每日自动重置计数</li>
+                <li>✅ <strong>防重复计数</strong>：同一用户短时间内不重复计算</li>
+                <li>✅ <strong>多种显示样式</strong>：数字、图片、徽章等形式</li>
+                <li>✅ <strong>完全免费</strong>：无需注册，立即使用</li>
+            </ul>
+        </div>
+
+        <!-- 实时演示 -->
+        <div class="demo-section">
+            <h2>🔴 实时演示</h2>
+            <div class="counter-display">
+                <div class="counter-item">
+                    <span class="counter-label">总访问量</span>
+                    <span id="demo-total" class="counter-number">--</span>
+                    <div class="counter-image">
+                        <img id="total-counter-img" src="" alt="Total Counter" style="border: none;">
+                    </div>
+                </div>
+                <div class="counter-item">
+                    <span class="counter-label">今日访问量</span>
+                    <span id="demo-today" class="counter-number">--</span>
+                    <div class="counter-image">
+                        <img id="today-counter-img" src="" alt="Today Counter" style="border: none;">
+                    </div>
+                </div>
+            </div>
+            <button class="btn" onclick="refreshCounters()">🔄 刷新计数器</button>
+            <button class="btn btn-success" onclick="simulateVisit()">➕ 模拟访问</button>
+        </div>
+
+        <!-- 配置生成器 -->
+        <div class="config-form">
+            <h2>⚙️ 自定义配置生成器</h2>
+            <div class="form-group">
+                <label for="site-name">网站名称/标识：</label>
+                <input type="text" id="site-name" value="zedxzk.github.io" placeholder="输入您的网站标识">
+            </div>
+            <div class="form-group">
+                <label for="counter-style">计数器样式：</label>
+                <select id="counter-style">
+                    <option value="0001">样式1 - 简洁数字</option>
+                    <option value="0006" selected>样式2 - 蓝色背景</option>
+                    <option value="0025">样式3 - 透明背景</option>
+                    <option value="0014">样式4 - 黑色背景</option>
+                    <option value="0020">样式5 - 绿色背景</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="digits-count">显示位数：</label>
+                <select id="digits-count">
+                    <option value="4">4位数</option>
+                    <option value="5">5位数</option>
+                    <option value="6" selected>6位数</option>
+                    <option value="7">7位数</option>
+                </select>
+            </div>
+            <button class="btn btn-success" onclick="generateCode()">🚀 生成代码</button>
+        </div>
+
+        <!-- 生成的代码 -->
+        <div id="generated-code" class="code-section" style="display: none;">
+            <h3>📝 生成的代码</h3>
+            <p><strong>HTML 代码（直接复制粘贴）：</strong></p>
+            <div class="code-block" id="html-code"></div>
+            
+            <p><strong>JavaScript 集成代码：</strong></p>
+            <div class="code-block" id="js-code"></div>
+        </div>
+
+        <!-- 服务比较 -->
+        <div class="service-comparison">
+            <div class="service-card">
+                <h3>🔥 HitWebCounter</h3>
+                <p><strong>优势：</strong></p>
+                <ul>
+                    <li>支持总访问量 + 今日访问量</li>
+                    <li>多种美观样式</li>
+                    <li>统计报告功能</li>
+                    <li>完全免费</li>
+                </ul>
+                <p><strong>实现方式：</strong></p>
+                <ul>
+                    <li>总访问量：固定页面ID</li>
+                    <li>今日访问量：页面ID + 日期</li>
+                </ul>
+                <div style="text-align: center; margin: 10px 0;">
+                    <img src="https://hitwebcounter.com/counter/counter.php?page=demo_total&style=0006&nbdigits=6&type=page&initCount=123" alt="Total Demo">
+                    <br><small>总访问量示例</small>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>🏷️ Visitor Badge</h3>
+                <p><strong>优势：</strong></p>
+                <ul>
+                    <li>GitHub 风格徽章</li>
+                    <li>自定义颜色</li>
+                    <li>简洁美观</li>
+                    <li>轻量级</li>
+                </ul>
+                <p><strong>限制：</strong></p>
+                <ul>
+                    <li>只显示总访问量</li>
+                    <li>无详细统计</li>
+                </ul>
+                <div style="text-align: center; margin: 10px 0;">
+                    <img src="https://visitor-badge.laobi.icu/badge?page_id=demo.page&left_color=gray&right_color=blue&left_text=Visitors" alt="Badge Demo">
+                    <br><small>访问徽章示例</small>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <h3>💾 本地存储计数</h3>
+                <p><strong>优势：</strong></p>
+                <ul>
+                    <li>完全本地化</li>
+                    <li>支持任意统计</li>
+                    <li>无外部依赖</li>
+                    <li>可完全自定义</li>
+                </ul>
+                <p><strong>限制：</strong></p>
+                <ul>
+                    <li>仅限单设备</li>
+                    <li>清除缓存数据丢失</li>
+                </ul>
+                <div style="text-align: center; margin: 10px 0;">
+                    <div style="background: #007bff; color: white; padding: 8px 15px; border-radius: 5px; display: inline-block;">
+                        <span>总访问: <span id="local-total">--</span></span>
+                        <span style="margin-left: 15px;">今日: <span id="local-today">--</span></span>
+                    </div>
+                    <br><small>本地计数器示例</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- 快速部署步骤 -->
+        <div class="setup-steps">
+            <h2>🚀 快速部署步骤</h2>
+            <ol>
+                <li><strong>选择方案</strong>：推荐使用 HitWebCounter (支持双计数)</li>
+                <li><strong>生成代码</strong>：使用上方的配置生成器</li>
+                <li><strong>复制代码</strong>：将生成的 HTML 代码复制到您的页面</li>
+                <li><strong>测试功能</strong>：刷新页面查看计数器是否正常工作</li>
+                <li><strong>自定义样式</strong>：根据需要调整 CSS 样式</li>
+            </ol>
+            
+            <div class="highlight">
+                <p><strong>💡 小贴士：</strong></p>
+                <ul>
+                    <li>使用不同的页面ID来区分总访问量和今日访问量</li>
+                    <li>今日访问量ID建议包含日期，如：<code>yoursite_2025-09-04</code></li>
+                    <li>可以组合多种服务以获得更好的效果和备用方案</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面初始化
+        window.addEventListener('load', function() {
+            initDemoCounters();
+            initLocalCounters();
+        });
+
+        // 初始化演示计数器
+        function initDemoCounters() {
+            const pageId = 'demo_config_' + Math.random().toString(36).substr(2, 5);
+            const style = document.getElementById('counter-style').value;
+            const digits = document.getElementById('digits-count').value;
+            
+            updateCounterImages(pageId, style, digits);
+        }
+
+        // 更新计数器图片
+        function updateCounterImages(pageId, style, digits) {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // 总访问量计数器
+            const totalImg = document.getElementById('total-counter-img');
+            totalImg.src = `https://hitwebcounter.com/counter/counter.php?page=${pageId}_total&style=${style}&nbdigits=${digits}&type=page&initCount=0`;
+            
+            // 今日访问量计数器
+            const todayImg = document.getElementById('today-counter-img');
+            todayImg.src = `https://hitwebcounter.com/counter/counter.php?page=${pageId}_${today}&style=${style}&nbdigits=4&type=page&initCount=0`;
+            
+            // 模拟更新数字显示
+            setTimeout(() => {
+                document.getElementById('demo-total').textContent = Math.floor(Math.random() * 1000) + 100;
+                document.getElementById('demo-today').textContent = Math.floor(Math.random() * 50) + 1;
+            }, 1000);
+        }
+
+        // 刷新计数器
+        function refreshCounters() {
+            initDemoCounters();
+        }
+
+        // 模拟访问
+        function simulateVisit() {
+            const totalElement = document.getElementById('demo-total');
+            const todayElement = document.getElementById('demo-today');
+            
+            if (totalElement.textContent !== '--') {
+                totalElement.textContent = parseInt(totalElement.textContent) + 1;
+            }
+            if (todayElement.textContent !== '--') {
+                todayElement.textContent = parseInt(todayElement.textContent) + 1;
+            }
+            
+            // 更新本地计数器
+            updateLocalCounters();
+        }
+
+        // 生成代码
+        function generateCode() {
+            const siteName = document.getElementById('site-name').value || 'yoursite';
+            const style = document.getElementById('counter-style').value;
+            const digits = document.getElementById('digits-count').value;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const pageIdTotal = `${siteName}_total`;
+            const pageIdToday = `${siteName}_${today}`;
+            
+            // HTML 代码
+            const htmlCode = `<!-- 总访问量计数器 -->
+<div class="total-counter">
+    <span>总访问量: </span>
+    <img src="https://hitwebcounter.com/counter/counter.php?page=${pageIdTotal}&style=${style}&nbdigits=${digits}&type=page&initCount=0" 
+         alt="Total Visits" style="border: none;">
+</div>
+
+<!-- 今日访问量计数器 -->
+<div class="today-counter">
+    <span>今日访问: </span>
+    <img src="https://hitwebcounter.com/counter/counter.php?page=${pageIdToday}&style=${style}&nbdigits=4&type=page&initCount=0" 
+         alt="Today Visits" style="border: none;">
+</div>`;
+
+            // JavaScript 代码
+            const jsCode = `// 动态加载访问计数器
+function loadVisitCounters() {
+    const today = new Date().toISOString().split('T')[0];
+    const siteName = '${siteName}';
+    
+    // 总访问量
+    const totalImg = document.createElement('img');
+    totalImg.src = \`https://hitwebcounter.com/counter/counter.php?page=\${siteName}_total&style=${style}&nbdigits=${digits}&type=page&initCount=0\`;
+    totalImg.alt = 'Total Visits';
+    totalImg.style.border = 'none';
+    document.getElementById('total-counter-container').appendChild(totalImg);
+    
+    // 今日访问量
+    const todayImg = document.createElement('img');
+    todayImg.src = \`https://hitwebcounter.com/counter/counter.php?page=\${siteName}_\${today}&style=${style}&nbdigits=4&type=page&initCount=0\`;
+    todayImg.alt = 'Today Visits';
+    todayImg.style.border = 'none';
+    document.getElementById('today-counter-container').appendChild(todayImg);
+}
+
+// 页面加载时执行
+window.addEventListener('load', loadVisitCounters);`;
+
+            // 显示生成的代码
+            document.getElementById('html-code').textContent = htmlCode;
+            document.getElementById('js-code').textContent = jsCode;
+            document.getElementById('generated-code').style.display = 'block';
+            
+            // 滚动到代码区域
+            document.getElementById('generated-code').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 初始化本地计数器
+        function initLocalCounters() {
+            let totalVisits = parseInt(localStorage.getItem('config_demo_total') || '0');
+            let todayVisits = parseInt(localStorage.getItem('config_demo_today') || '0');
+            
+            // 检查是否是新的一天
+            const today = new Date().toDateString();
+            const lastVisit = localStorage.getItem('config_demo_date');
+            
+            if (lastVisit !== today) {
+                todayVisits = 0;
+                localStorage.setItem('config_demo_date', today);
+                localStorage.setItem('config_demo_today', '0');
+            }
+            
+            // 如果是新会话，增加计数
+            if (!sessionStorage.getItem('config_demo_visited')) {
+                totalVisits++;
+                todayVisits++;
+                localStorage.setItem('config_demo_total', totalVisits);
+                localStorage.setItem('config_demo_today', todayVisits);
+                sessionStorage.setItem('config_demo_visited', 'true');
+            }
+            
+            document.getElementById('local-total').textContent = totalVisits;
+            document.getElementById('local-today').textContent = todayVisits;
+        }
+
+        // 更新本地计数器
+        function updateLocalCounters() {
+            let totalVisits = parseInt(localStorage.getItem('config_demo_total') || '0') + 1;
+            let todayVisits = parseInt(localStorage.getItem('config_demo_today') || '0') + 1;
+            
+            localStorage.setItem('config_demo_total', totalVisits);
+            localStorage.setItem('config_demo_today', todayVisits);
+            
+            document.getElementById('local-total').textContent = totalVisits;
+            document.getElementById('local-today').textContent = todayVisits;
+        }
+
+        // 样式变化时更新预览
+        document.getElementById('counter-style').addEventListener('change', initDemoCounters);
+        document.getElementById('digits-count').addEventListener('change', initDemoCounters);
+    </script>
+</body>
+</html>

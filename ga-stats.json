@@ -1,10 +1,9 @@
 {
-  "today_visits": 25,
-  "days30_visits": 0,
-  "total_visits": 25,
-  "period": "多时间段统计",
-  "last_updated": "2025-09-04 16:28:20",
-  "status": "success",
+  "total_users": 0,
+  "today_views": 0,
+  "last_updated": "2025-09-04 16:33:04",
+  "status": "error",
+  "error": "Your default credentials were not found. To set up Application Default Credentials, see https://cloud.google.com/docs/authentication/external/set-up-adc for more information.",
   "data_source": "Google Analytics API",
-  "metric_type": "sessions"
+  "message": "数据获取失败，请检查配置"
 }

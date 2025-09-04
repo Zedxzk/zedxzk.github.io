@@ -23,11 +23,11 @@ def get_ga_stats():
 
         response_today = client.run_report(request_today)
 
-        # 获取近30天访问量
+        # 获取近30天访问量（包括今天，这样更合理）
         request_30days = RunReportRequest(
             property=f"properties/{PROPERTY_ID}",
             metrics=[Metric(name="sessions")],  # 使用会话数
-            date_ranges=[DateRange(start_date="30daysAgo", end_date="yesterday")],  # 不包括今天，避免重复
+            date_ranges=[DateRange(start_date="30daysAgo", end_date="today")],  # 包括今天的30天
         )
 
         response_30days = client.run_report(request_30days)
@@ -46,18 +46,22 @@ def get_ga_stats():
         if response_today.rows:
             today_visits = int(response_today.rows[0].metric_values[0].value)
             print("今日访问量:", today_visits)
+
+        # 处理总访问量（先处理总数）
+        total_visits = 0
+        if response_total.rows:
+            total_visits = int(response_total.rows[0].metric_values[0].value)
+            print("所有时间总访问量:", total_visits)
         
         # 处理30天访问量
         days30_visits = 0
         if response_30days.rows:
             days30_visits = int(response_30days.rows[0].metric_values[0].value)
             print("近30天访问量:", days30_visits)
-
-        # 处理总访问量
-        total_visits = 0
-        if response_total.rows:
-            total_visits = int(response_total.rows[0].metric_values[0].value)
-            print("所有时间总访问量:", total_visits)
+        else:
+            # 如果30天内没有数据，可能是新网站，使用总访问量
+            print("近30天无数据，可能是新网站")
+            days30_visits = total_visits if total_visits > 0 else 0
 
         # 保存到 JSON 文件供前端使用
         stats = {

@@ -77,24 +77,19 @@ function applyCurrentLanguage() {
 
 // GitHub Pages 访问计数器
 function initGitHubCounter() {
-    console.log('初始化Gist计数器...');
+    console.log('初始化Gist访问计数器...');
     
-    // 优先尝试使用Gist计数器
-    if (typeof initGistCounter === 'function') {
-        initGistCounter();
-        return;
-    }
-    
-    // 如果Gist计数器不可用，使用CountAPI作为备选
     const counterElement = document.getElementById('github-count');
+    const todayElement = document.getElementById('today-count');
     const statusElement = document.getElementById('counter-status');
     
     if (!counterElement) return;
     
     // 在本地开发模式下跳过计数器API
     if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.port === '5500') {
-        console.log('本地开发模式，跳过GitHub计数器API');
+        console.log('本地开发模式，跳过Gist计数器');
         counterElement.textContent = '--';
+        if (todayElement) todayElement.textContent = '--';
         if (statusElement) {
             statusElement.innerHTML = '<span class="lang-cn">本地开发模式</span><span class="lang-en">Local dev mode</span>';
             setTimeout(applyCurrentLanguage, 100);
@@ -103,56 +98,73 @@ function initGitHubCounter() {
     }
     
     // 显示加载状态
-    counterElement.textContent = '--';
+    counterElement.textContent = '...';
+    if (todayElement) todayElement.textContent = '...';
     
-    // 尝试加载计数器API
-    loadCounterAPI();
+    // 加载Gist统计数据
+    loadGistStats();
     
-    console.log('GitHub计数器初始化完成');
+    console.log('Gist访问计数器初始化完成');
 }
 
-// 可选：集成计数器API（备用方案）
-async function loadCounterAPI() {
+// 从GitHub Gist读取访问统计数据
+async function loadGistStats() {
     const counterElement = document.getElementById('github-count');
+    const todayElement = document.getElementById('today-count');
     const statusElement = document.getElementById('counter-status');
     
     if (!counterElement) return;
     
     try {
-        // 使用免费的计数器API服务
-        const response = await fetch('https://api.countapi.xyz/hit/zedxzk.github.io/visits', {
-            method: 'GET',
+        // 公开访问Gist，无需token
+        const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
+        const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/vnd.github.v3+json'
             }
         });
         
         if (response.ok) {
-            const data = await response.json();
-            counterElement.textContent = data.value;
+            const gist = await response.json();
+            const content = gist.files['gistfile1.txt']?.content;
             
-            if (statusElement) {
-                statusElement.innerHTML = '<span class="lang-cn">API统计</span><span class="lang-en">API Stats</span>';
+            if (content) {
+                const data = JSON.parse(content);
                 
-                // 确保应用当前语言设置
-                setTimeout(applyCurrentLanguage, 100);
+                // 更新显示
+                counterElement.textContent = data.total_visits || 0;
+                if (todayElement) {
+                    todayElement.textContent = data.today_visits || 0;
+                }
+                
+                if (statusElement) {
+                    const lastUpdated = data.last_updated || '未知';
+                    statusElement.innerHTML = `
+                        <span class="lang-cn">Gist数据 (${lastUpdated})</span>
+                        <span class="lang-en">Gist data (${lastUpdated})</span>
+                    `;
+                    setTimeout(applyCurrentLanguage, 100);
+                }
+                
+                console.log('Gist统计加载成功:', data);
+            } else {
+                throw new Error('Gist文件内容为空');
             }
-            
-            console.log('计数器API加载成功：', data.value);
         } else {
-            throw new Error('API响应失败');
+            throw new Error(`Gist API错误: ${response.status}`);
         }
     } catch (error) {
-        console.log('计数器API不可用');
+        console.log('Gist统计加载失败:', error.message);
         
-        if (counterElement) {
-            counterElement.textContent = '--';
-        }
+        // 显示错误状态
+        counterElement.textContent = '--';
+        if (todayElement) todayElement.textContent = '--';
         
         if (statusElement) {
-            statusElement.innerHTML = '<span class="lang-cn">API不可用</span><span class="lang-en">API Unavailable</span>';
-            
-            // 确保应用当前语言设置
+            statusElement.innerHTML = `
+                <span class="lang-cn">无法加载统计</span>
+                <span class="lang-en">Failed to load stats</span>
+            `;
             setTimeout(applyCurrentLanguage, 100);
         }
     }

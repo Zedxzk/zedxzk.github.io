@@ -549,6 +549,14 @@ footer p {
     margin-bottom: 15px;
 }
 
+/* 计数器行布局 */
+.counter-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    align-items: stretch;
+}
+
 /* 单个计数器项目 */
 .counter-item {
     text-align: center;
@@ -556,6 +564,8 @@ footer p {
     background: rgba(255, 255, 255, 0.8);
     border-radius: 8px;
     border: 1px solid rgba(40, 167, 69, 0.3);
+    flex: 1;
+    min-width: 120px;
 }
 
 .counter-label {
@@ -586,8 +596,14 @@ footer p {
         gap: 10px;
     }
     
+    .counter-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
     .counter-item {
         padding: 8px;
+        min-width: auto;
     }
     
     .counter-label {

@@ -64,6 +64,12 @@ class ComponentLoader {
     }
 }
 
+// 应用当前语言设置到新添加的元素
+function applyCurrentLanguage() {
+    const currentLang = document.documentElement.lang === 'en' ? 'en' : 'cn';
+    switchLanguage(currentLang);
+}
+
 // Google Analytics 访问计数器
 function initGoogleAnalyticsCounter() {
     console.log('初始化Google Analytics计数器...');
@@ -126,6 +132,9 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
                         <span class="lang-cn">GA 数据 (${dateOnly})</span>
                         <span class="lang-en">GA Data (${dateOnly})</span>
                     `;
+                    
+                    // 确保应用当前语言设置
+                    setTimeout(applyCurrentLanguage, 100);
                 }
                 return true;
             } else if (data.error) {
@@ -135,6 +144,9 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
                         <span class="lang-cn">GA 配置错误</span>
                         <span class="lang-en">GA Config Error</span>
                     `;
+                    
+                    // 确保应用当前语言设置
+                    setTimeout(applyCurrentLanguage, 100);
                 }
             } else if (data.status === 'no_data') {
                 if (statusElement) {
@@ -142,6 +154,9 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
                         <span class="lang-cn">暂无数据</span>
                         <span class="lang-en">No data available</span>
                     `;
+                    
+                    // 确保应用当前语言设置
+                    setTimeout(applyCurrentLanguage, 100);
                 }
                 return true; // 仍然算作成功，只是没有数据
             }
@@ -155,6 +170,9 @@ async function fetchGAStatsFromFile(visitCountElement, statusElement) {
                 <span class="lang-cn">数据加载中...</span>
                 <span class="lang-en">Loading data...</span>
             `;
+            
+            // 确保应用当前语言设置
+            setTimeout(applyCurrentLanguage, 100);
         }
     }
     
@@ -174,6 +192,9 @@ async function refreshGAStats() {
             <span class="lang-cn">正在刷新数据...</span>
             <span class="lang-en">Refreshing data...</span>
         `;
+        
+        // 确保应用当前语言设置
+        setTimeout(applyCurrentLanguage, 100);
     }
     
     try {
@@ -190,6 +211,9 @@ async function refreshGAStats() {
                     <span class="lang-cn">使用本地计数</span>
                     <span class="lang-en">Using local counter</span>
                 `;
+                
+                // 确保应用当前语言设置
+                setTimeout(applyCurrentLanguage, 100);
             }
             setupFallbackCounter(visitCountElement, statusElement);
         }
@@ -211,6 +235,9 @@ function setupFallbackCounter(visitCountElement, statusElement) {
     
     if (statusElement) {
         statusElement.innerHTML = '<span class="lang-cn">本地计数 + GA 后台统计</span><span class="lang-en">Local count + GA backend tracking</span>';
+        
+        // 确保应用当前语言设置
+        setTimeout(applyCurrentLanguage, 100);
     }
     
     console.log('使用备用计数器，当前访问次数:', visitCount);
@@ -274,6 +301,9 @@ async function loadCounterAPI() {
             
             if (statusElement) {
                 statusElement.innerHTML = '<span class="lang-cn">API统计</span><span class="lang-en">API Stats</span>';
+                
+                // 确保应用当前语言设置
+                setTimeout(applyCurrentLanguage, 100);
             }
             
             console.log('计数器API加载成功：', data.value);
@@ -290,6 +320,9 @@ async function loadCounterAPI() {
         
         if (statusElement) {
             statusElement.innerHTML = '<span class="lang-cn">本地统计</span><span class="lang-en">Local Stats</span>';
+            
+            // 确保应用当前语言设置
+            setTimeout(applyCurrentLanguage, 100);
         }
     }
 }

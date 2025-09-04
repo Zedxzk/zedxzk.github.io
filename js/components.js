@@ -66,6 +66,11 @@ class ComponentLoader {
         setTimeout(function() {
             initGoogleAnalyticsCounter();
         }, 2000);
+        
+        // 初始化GitHub计数器
+        setTimeout(function() {
+            initGitHubCounter();
+        }, 2500);
     }
 }
 
@@ -95,33 +100,42 @@ function initGoogleAnalyticsCounter() {
     days30CountElement.textContent = '--';
     totalCountElement.textContent = '--';
     
-    // 在本地文件模式下，直接使用备用计数器
+    // 在本地文件模式下，显示提示信息
     if (window.location.protocol === 'file:') {
-        console.log('检测到本地文件模式，使用备用计数器');
-        setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        console.log('检测到本地文件模式，API功能不可用');
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">本地文件模式下无法连接API</span>
+                <span class="lang-en">API unavailable in local file mode</span>
+            `;
+        }
         return;
     }
     
-    // 方法1: 优先从ga-stats.json文件读取数据
-    fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
+    // 在本地开发服务器模式下，显示提示信息并跳过API调用
+    if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+        console.log('检测到本地开发模式，跳过API调用');
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">本地开发模式 - 数据将在部署后显示</span>
+                <span class="lang-en">Local dev mode - Data will show after deployment</span>
+            `;
+            // 确保应用当前语言设置
+            setTimeout(applyCurrentLanguage, 100);
+        }
+        return; // 在本地开发模式下直接返回，不调用API
+    }
     
-    // 方法2: 每次访问时尝试触发更新（可选）
-    triggerGAStatsUpdate();
+    // 直接从API获取数据
+    fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalCountElement, statusElement);
     
-    // 方法3: 确保GA跟踪代码正常工作
+    // 方法2: 确保GA跟踪代码正常工作
     if (typeof gtag !== 'undefined') {
         gtag('event', 'page_view', {
             'page_title': document.title,
             'page_location': window.location.href
         });
     }
-    
-    // 方法3: 备用的本地计数器（5秒后如果还没有数据）
-    setTimeout(function() {
-        if (todayCountElement.textContent === '--') {
-            setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
-        }
-    }, 5000);
 }
 
 // 从 Google Analytics Reporting API 直接获取数据
@@ -200,19 +214,19 @@ async function fetchGAStatsDirectly(todayCountElement, days30CountElement, total
         
     } catch (error) {
         console.log('GA API 直接访问失败:', error.message);
-        // 回退到文件方式
-        return await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        // 回退到API方式
+        return await fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalCountElement, statusElement);
     }
 }
 
-// 从 ga-stats.json 文件读取数据
-async function fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement) {
+// 从API获取GA统计数据
+async function fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     try {
-        console.log('尝试从 ga-stats.json 获取数据...');
+        console.log('从API获取GA统计数据...');
         
         // 添加时间戳避免缓存问题
         const timestamp = new Date().getTime();
-        const response = await fetch(`./ga-stats.json?t=${timestamp}`, {
+        const response = await fetch(`/api/ga-stats?t=${timestamp}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -224,7 +238,7 @@ async function fetchGAStatsFromFile(todayCountElement, days30CountElement, total
         
         if (response.ok) {
             const data = await response.json();
-            console.log('GA JSON数据:', data);
+            console.log('API返回数据:', data);
             
             if (data.today_visits !== undefined || data.days30_visits !== undefined || data.total_visits !== undefined) {
                 // 数据验证和合理性检查
@@ -260,11 +274,11 @@ async function fetchGAStatsFromFile(todayCountElement, days30CountElement, total
                 }
                 return true;
             } else if (data.error) {
-                console.log('GA JSON错误:', data.error);
+                console.log('API错误:', data.error);
                 if (statusElement) {
                     statusElement.innerHTML = `
-                        <span class="lang-cn">GA 配置错误</span>
-                        <span class="lang-en">GA Config Error</span>
+                        <span class="lang-cn">API 配置错误</span>
+                        <span class="lang-en">API Config Error</span>
                     `;
                     
                     // 确保应用当前语言设置
@@ -283,14 +297,14 @@ async function fetchGAStatsFromFile(todayCountElement, days30CountElement, total
                 return true; // 仍然算作成功，只是没有数据
             }
         } else {
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(`API HTTP ${response.status}`);
         }
     } catch (error) {
-        console.log('无法读取 ga-stats.json 文件:', error.message);
+        console.log('无法从API读取数据:', error.message);
         if (statusElement) {
             statusElement.innerHTML = `
-                <span class="lang-cn">数据加载中...</span>
-                <span class="lang-en">Loading data...</span>
+                <span class="lang-cn">连接API中...</span>
+                <span class="lang-en">Connecting to API...</span>
             `;
             
             // 确保应用当前语言设置
@@ -329,66 +343,39 @@ async function refreshGAStats() {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // 重新获取数据（强制绕过缓存）
-        const success = await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        const success = await fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalCountElement, statusElement);
         
         if (!success) {
-            // 如果没有GA数据，使用备用计数器
+            // 如果API获取失败，显示错误信息
             if (statusElement) {
                 statusElement.innerHTML = `
-                    <span class="lang-cn">使用本地计数</span>
-                    <span class="lang-en">Using local counter</span>
+                    <span class="lang-cn">API连接失败</span>
+                    <span class="lang-en">API connection failed</span>
                 `;
                 
                 // 确保应用当前语言设置
                 setTimeout(applyCurrentLanguage, 100);
             }
-            setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
         }
         
     } catch (error) {
         console.log('刷新失败:', error);
-        setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">刷新失败</span>
+                <span class="lang-en">Refresh failed</span>
+            `;
+            setTimeout(applyCurrentLanguage, 100);
+        }
     }
 }
 
-// 备用计数器方案
-function setupFallbackCounter(todayCountElement, days30CountElement, totalCountElement, statusElement) {
-    // 使用localStorage作为备用计数方案
-    let visitCount = parseInt(localStorage.getItem('ga_visit_count') || '0');
-    visitCount += 1;
-    localStorage.setItem('ga_visit_count', visitCount);
-    
-    // 为备用计数器提供合理的分配
-    const todayCount = Math.floor(visitCount * 0.1) || 1; // 假设今日是总数的10%
-    const days30Count = Math.floor(visitCount * 0.6) || Math.floor(visitCount / 2); // 假设30天是总数的60%
-    
-    todayCountElement.textContent = todayCount;
-    days30CountElement.textContent = days30Count;
-    totalCountElement.textContent = visitCount;
-    
-    if (statusElement) {
-        statusElement.innerHTML = '<span class="lang-cn">本地计数 + GA 后台统计</span><span class="lang-en">Local count + GA backend tracking</span>';
-        
-        // 确保应用当前语言设置
-        setTimeout(applyCurrentLanguage, 100);
-    }
-    
-    console.log('使用备用计数器，当前访问次数:', visitCount);
-    
-    // 定期检查和更新
-    setInterval(function() {
-        // 这里可以添加定期从后端API获取GA数据的逻辑
-        checkForGAUpdates(todayCountElement, days30CountElement, totalCountElement, statusElement);
-    }, 30000); // 每30秒检查一次
-}
-
-// 检查GA数据更新
+// 检查GA数据更新（简化版）
 async function checkForGAUpdates(todayCountElement, days30CountElement, totalCountElement, statusElement) {
     try {
-        const success = await fetchGAStatsFromFile(todayCountElement, days30CountElement, totalCountElement, statusElement);
+        const success = await fetchGAStatsFromAPI(todayCountElement, days30CountElement, totalCountElement, statusElement);
         if (!success) {
-            // 如果文件读取失败，保持当前的本地计数
-            console.log('ga-stats.json 文件暂时不可用，继续使用本地计数');
+            console.log('API暂时不可用');
         }
     } catch (error) {
         console.log('定期更新检查失败:', error);
@@ -402,9 +389,8 @@ function initGitHubCounter() {
     
     if (!counterElement) return;
     
-    // 首先显示本地存储的计数
-    let currentCount = parseInt(localStorage.getItem('githubPageViews') || '0');
-    counterElement.textContent = currentCount || '--';
+    // 显示加载状态
+    counterElement.textContent = '--';
     
     // 尝试加载计数器API
     loadCounterAPI();
@@ -444,15 +430,14 @@ async function loadCounterAPI() {
             throw new Error('API响应失败');
         }
     } catch (error) {
-        console.log('计数器API不可用，使用本地计数器');
+        console.log('计数器API不可用');
         
-        // 回退到本地计数器
-        let currentCount = parseInt(localStorage.getItem('githubPageViews') || '0') + 1;
-        localStorage.setItem('githubPageViews', currentCount);
-        counterElement.textContent = currentCount;
+        if (counterElement) {
+            counterElement.textContent = '--';
+        }
         
         if (statusElement) {
-            statusElement.innerHTML = '<span class="lang-cn">本地统计</span><span class="lang-en">Local Stats</span>';
+            statusElement.innerHTML = '<span class="lang-cn">API不可用</span><span class="lang-en">API Unavailable</span>';
             
             // 确保应用当前语言设置
             setTimeout(applyCurrentLanguage, 100);
@@ -463,19 +448,6 @@ async function loadCounterAPI() {
 // 触发GitHub Actions更新GA统计数据
 async function triggerGAStatsUpdate() {
     try {
-        // 检查上次更新时间，避免频繁触发
-        const lastUpdate = localStorage.getItem('ga_last_update');
-        const now = Date.now();
-        const updateInterval = 5 * 60 * 1000; // 5分钟内不重复触发
-        
-        if (lastUpdate && (now - parseInt(lastUpdate)) < updateInterval) {
-            console.log('最近已更新GA统计，跳过触发');
-            return;
-        }
-        
-        // 更新本地缓存时间
-        localStorage.setItem('ga_last_update', now.toString());
-        
         console.log('触发GA统计数据更新...');
         
         // 注意：这需要Personal Access Token和仓库权限
@@ -499,9 +471,6 @@ async function forceUpdateGAStats() {
             setTimeout(applyCurrentLanguage, 100);
         }
     });
-    
-    // 清除缓存限制
-    localStorage.removeItem('ga_last_update');
     
     // 触发更新
     await triggerGAStatsUpdate();

@@ -1,24 +1,16 @@
-name: Update Google Analytics Stats
+name: Update Google Analytics Credentials
 
 on:
-  # 每天运行一次（UTC 时间）
-  schedule:
-    - cron: '0 8 * * *'  # 每天 UTC 8:00（北京时间 16:00）
-  
-  # 允许手动触发
+  # 允许手动触发来更新凭证
   workflow_dispatch:
-  
-  # 允许外部webhook触发
-  repository_dispatch:
-    types: [update-ga-stats]
 
 # 设置权限
 permissions:
-  contents: write
+  contents: read
   actions: read
 
 jobs:
-  update-stats:
+  update-credentials:
     runs-on: ubuntu-latest
     
     steps:
@@ -36,33 +28,11 @@ jobs:
       run: |
         pip install google-analytics-data google-auth
         
-    - name: Create service account credentials
+    - name: Verify GA credentials
       env:
         GA_CREDENTIALS: ${{ secrets.GA_CREDENTIALS }}
       run: |
         echo "$GA_CREDENTIALS" > service-account-key.json
-        echo "✅ 凭证文件已创建"
-        
-    - name: Verify GA setup
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: service-account-key.json
-      run: |
+        export GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json
         python verify-setup.py
-        
-    - name: Run GA stats script
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: service-account-key.json
-      run: |
-        python test.py
-        
-    - name: Commit and push if changed
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add ga-stats.json
-        if ! git diff --staged --quiet; then
-          git commit -m "[skip ci] Auto-update GA stats $(date)"
-          git push
-        else
-          echo "No changes to commit"
-        fi
+        echo "✅ GA凭证验证成功"

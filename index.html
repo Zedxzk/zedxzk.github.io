@@ -36,36 +36,6 @@
         gtag('js', new Date());
         gtag('config', 'G-948FSCZCD2');
     </script>
-    
-    <!-- StatCounter Code (兼容版本) -->
-    <script type="text/javascript">
-    var sc_project=13164698; 
-    var sc_invisible=0;  // 0 = 可见计数器, 1 = 不可见计数器
-    var sc_security="ab250e98"; 
-    
-    // 使用动态加载替代document.write
-    function loadStatCounter() {
-        try {
-            var script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://statcounter.com/counter/counter.js';
-            script.async = true;
-            script.onerror = function() {
-                console.log('StatCounter加载失败，可能是网络问题');
-            };
-            document.head.appendChild(script);
-        } catch (e) {
-            console.log('StatCounter初始化失败:', e);
-        }
-    }
-    
-    // 页面加载后安全加载StatCounter
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadStatCounter);
-    } else {
-        loadStatCounter();
-    }
-    </script>
 </head>
 <body>
     <div class="container">

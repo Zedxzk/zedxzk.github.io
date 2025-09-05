@@ -548,7 +548,41 @@ function toggleTalks(category) {
     }
 }
 
-// 当iframe加载完成后移除它
+// GitHub Pages环境下自动访问Vercel应用
+function triggerVercelVisit() {
+    try {
+        console.log('🔍 [Vercel访问] 开始环境检测...');
+        console.log('🔍 [Vercel访问] 当前域名:', window.location.hostname);
+        console.log('🔍 [Vercel访问] 当前协议:', window.location.protocol);
+        console.log('🔍 [Vercel访问] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
+        
+        // 创建一个隐藏的iframe来访问Vercel应用
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.src = 'https://zedxzk-github-io.vercel.app';
+        
+        const startTime = Date.now();
+        console.log('🚀 [Vercel访问] 创建iframe，目标URL:', iframe.src);
+        console.log('🚀 [Vercel访问] 开始时间:', new Date(startTime).toISOString());
+        
+        // 设置超时，防止iframe加载过久
+        const timeout = setTimeout(() => {
+            const elapsed = Date.now() - startTime;
+            console.log('⏰ [Vercel访问] 访问超时 (10秒)');
+            console.log('⏰ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('⏰ [Vercel访问] 移除iframe');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+            // 超时后仍尝试通过CORS获取数据
+            console.log('🔄 [Vercel访问] 超时后尝试通过CORS获取数据');
+            loadVercelDataViaCORS();
+        }, 10000); // 10秒超时
+        
+        // 当iframe加载完成后移除它
         iframe.onload = function() {
             const elapsed = Date.now() - startTime;
             console.log('✅ [Vercel访问] 应用访问成功');
@@ -566,6 +600,36 @@ function toggleTalks(category) {
             console.log('📊 [Vercel访问] 访问成功后通过CORS获取数据');
             loadVercelDataViaCORS();
         };
+        
+        iframe.onerror = function() {
+            const elapsed = Date.now() - startTime;
+            console.log('❌ [Vercel访问] 应用访问失败');
+            console.log('❌ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('❌ [Vercel访问] 失败时间:', new Date().toISOString());
+            clearTimeout(timeout);
+            
+            console.log('🧹 [Vercel访问] 清理iframe (失败)');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+            // 访问失败后仍尝试通过CORS获取数据
+            console.log('🔄 [Vercel访问] 失败后尝试通过CORS获取数据');
+            loadVercelDataViaCORS();
+        };
+        
+        // 添加到页面
+        document.body.appendChild(iframe);
+        console.log('📤 [Vercel访问] iframe已添加到页面');
+        console.log('🔄 [Vercel访问] 等待访问结果...');
+        
+    } catch (error) {
+        console.log('❌ [Vercel访问] 触发访问时出错:', error.message);
+        console.log('❌ [Vercel访问] 错误详情:', error);
+        // 出错后仍尝试通过CORS获取数据
+        console.log('🔄 [Vercel访问] 出错后尝试通过CORS获取数据');
+        loadVercelDataViaCORS();
+    }
+}
 
 // 通过CORS获取Vercel数据（只获取，不计数）
 async function loadVercelDataViaCORS() {

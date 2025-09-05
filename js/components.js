@@ -103,6 +103,7 @@ function initGitHubCounter() {
         console.log('📡 GitHub Pages环境，自动访问Vercel应用...');
         console.log('📡 [Vercel访问] 准备触发自动访问');
         triggerVercelVisit();
+        return; // 不继续执行，避免重复调用
     }
     
     // Vercel 环境使用完整功能
@@ -526,43 +527,82 @@ function toggleTalks(category) {
 // GitHub Pages环境下自动访问Vercel应用
 function triggerVercelVisit() {
     try {
-        console.log('🔍 [Vercel重定向] 开始环境检测...');
-        console.log('🔍 [Vercel重定向] 当前域名:', window.location.hostname);
-        console.log('🔍 [Vercel重定向] 当前协议:', window.location.protocol);
-        console.log('🔍 [Vercel重定向] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
+        console.log('🔍 [Vercel访问] 开始环境检测...');
+        console.log('🔍 [Vercel访问] 当前域名:', window.location.hostname);
+        console.log('🔍 [Vercel访问] 当前协议:', window.location.protocol);
+        console.log('🔍 [Vercel访问] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
         
-        // 检查是否已经重定向过（防止无限重定向）
-        const hasRedirected = sessionStorage.getItem('vercel_redirected');
-        if (hasRedirected) {
-            console.log('🔄 [Vercel重定向] 已重定向过，跳过');
-            return;
-        }
+        // 创建一个隐藏的iframe来访问Vercel应用
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.src = 'https://zedxzk-github-io.vercel.app';
         
-        // 标记已重定向
-        sessionStorage.setItem('vercel_redirected', 'true');
+        const startTime = Date.now();
+        console.log('🚀 [Vercel访问] 创建iframe，目标URL:', iframe.src);
+        console.log('🚀 [Vercel访问] 开始时间:', new Date(startTime).toISOString());
         
-        const vercelUrl = 'https://zedxzk-github-io.vercel.app';
-        console.log('🚀 [Vercel重定向] 准备重定向到:', vercelUrl);
-        console.log('🚀 [Vercel重定向] 重定向时间:', new Date().toISOString());
+        // 设置超时，防止iframe加载过久
+        const timeout = setTimeout(() => {
+            const elapsed = Date.now() - startTime;
+            console.log('⏰ [Vercel访问] 访问超时 (10秒)');
+            console.log('⏰ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('⏰ [Vercel访问] 移除iframe');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+            // 超时后仍尝试从GIST获取数据
+            console.log('🔄 [Vercel访问] 超时后尝试从GIST获取数据');
+            loadGitHubRepoStats();
+        }, 10000); // 10秒超时
         
-        // 自动重定向版本（无提示）
-        console.log('✅ [Vercel重定向] 自动重定向到完整功能版本');
-        window.location.href = vercelUrl;
+        // 当iframe加载完成后移除它
+        iframe.onload = function() {
+            const elapsed = Date.now() - startTime;
+            console.log('✅ [Vercel访问] 应用访问成功');
+            console.log('✅ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('✅ [Vercel访问] 完成时间:', new Date().toISOString());
+            clearTimeout(timeout);
+            
+            setTimeout(() => {
+                console.log('🧹 [Vercel访问] 清理iframe');
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+                // 访问成功后从GIST获取最新数据
+                console.log('📊 [Vercel访问] 访问成功后从GIST获取数据');
+                loadGitHubRepoStats();
+            }, 1000); // 1秒后移除
+        };
         
-        /*
-        // 可选：带提示的重定向版本
-        if (confirm('检测到您正在访问GitHub Pages版本，是否跳转到完整功能版本？\n\nDetected GitHub Pages version, redirect to full-featured version?')) {
-            console.log('✅ [Vercel重定向] 用户确认重定向');
-            window.location.href = vercelUrl;
-        } else {
-            console.log('❌ [Vercel重定向] 用户取消重定向');
-            // 清除标记，允许下次再提示
-            sessionStorage.removeItem('vercel_redirected');
-        }
-        */
+        iframe.onerror = function() {
+            const elapsed = Date.now() - startTime;
+            console.log('❌ [Vercel访问] 应用访问失败');
+            console.log('❌ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('❌ [Vercel访问] 失败时间:', new Date().toISOString());
+            clearTimeout(timeout);
+            
+            console.log('🧹 [Vercel访问] 清理iframe (失败)');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+            // 访问失败后仍尝试从GIST获取数据
+            console.log('🔄 [Vercel访问] 失败后尝试从GIST获取数据');
+            loadGitHubRepoStats();
+        };
+        
+        // 添加到页面
+        document.body.appendChild(iframe);
+        console.log('📤 [Vercel访问] iframe已添加到页面');
+        console.log('🔄 [Vercel访问] 等待访问结果...');
         
     } catch (error) {
-        console.log('❌ [Vercel重定向] 重定向过程出错:', error.message);
-        console.log('❌ [Vercel重定向] 错误详情:', error);
+        console.log('❌ [Vercel访问] 触发访问时出错:', error.message);
+        console.log('❌ [Vercel访问] 错误详情:', error);
+        // 出错后仍尝试从GIST获取数据
+        console.log('🔄 [Vercel访问] 出错后尝试从GIST获取数据');
+        loadGitHubRepoStats();
     }
 }

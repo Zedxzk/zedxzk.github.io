@@ -130,27 +130,34 @@ async function loadGitHubRepoStats() {
         console.log('🔄 从GIST获取访问统计数据...');
         
         const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
-        const timestamp = Date.now(); // 添加时间戳防止缓存
-        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt?v=${timestamp}`;
+        // 使用GitHub API而不是raw URL来避免CORS问题
+        const API_URL = `https://api.github.com/gists/${GIST_ID}`;
         
-        console.log('📡 GIST请求URL:', RAW_URL);
+        console.log('📡 GIST API请求URL:', API_URL);
         
-        const response = await fetch(RAW_URL, {
+        const response = await fetch(API_URL, {
             cache: 'no-cache', // 禁用缓存
             headers: {
+                'Accept': 'application/vnd.github.v3+json',
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache'
             }
         });
         
-        console.log('📡 GIST响应状态:', response.status);
+        console.log('📡 GIST API响应状态:', response.status);
         
         if (response.ok) {
-            const content = await response.text();
-            console.log('📄 GIST原始内容:', content);
+            const gistData = await response.json();
+            console.log('📄 GIST API响应数据:', gistData);
             
-            if (content && content.trim()) {
-                const data = JSON.parse(content);
+            // 从Gist的files中获取内容
+            const fileName = Object.keys(gistData.files)[0]; // 获取第一个文件
+            const fileContent = gistData.files[fileName].content;
+            
+            console.log('📄 GIST文件内容:', fileContent);
+            
+            if (fileContent && fileContent.trim()) {
+                const data = JSON.parse(fileContent);
                 console.log('📊 解析后的数据:', data);
                 
                 // 显示数据
@@ -174,7 +181,7 @@ async function loadGitHubRepoStats() {
                 throw new Error('GIST内容为空');
             }
         } else {
-            throw new Error(`GIST请求失败: ${response.status}`);
+            throw new Error(`GIST API请求失败: ${response.status}`);
         }
     } catch (error) {
         console.log('❌ GIST数据加载失败:', error.message);

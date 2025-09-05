@@ -136,11 +136,8 @@ async function loadGitHubRepoStats() {
         console.log('📡 GIST API请求URL:', API_URL);
         
         const response = await fetch(API_URL, {
-            cache: 'no-cache', // 禁用缓存
             headers: {
-                'Accept': 'application/vnd.github.v3+json',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache'
+                'Accept': 'application/vnd.github.v3+json'
             }
         });
         
@@ -573,9 +570,9 @@ function triggerVercelVisit() {
             if (document.body.contains(iframe)) {
                 document.body.removeChild(iframe);
             }
-            // 超时后仍尝试从GIST获取数据
-            console.log('🔄 [Vercel访问] 超时后尝试从GIST获取数据');
-            loadGitHubRepoStats();
+            // 超时后仍尝试使用Vercel API获取数据
+            console.log('🔄 [Vercel访问] 超时后尝试使用Vercel API获取数据');
+            loadGistStats();
         }, 10000); // 10秒超时
         
         // 当iframe加载完成后移除它
@@ -586,15 +583,15 @@ function triggerVercelVisit() {
             console.log('✅ [Vercel访问] 完成时间:', new Date().toISOString());
             clearTimeout(timeout);
             
-            setTimeout(() => {
-                console.log('🧹 [Vercel访问] 清理iframe');
-                if (document.body.contains(iframe)) {
-                    document.body.removeChild(iframe);
-                }
-                // 访问成功后从GIST获取最新数据
-                console.log('📊 [Vercel访问] 访问成功后从GIST获取数据');
-                loadGitHubRepoStats();
-            }, 1000); // 1秒后移除
+            // 立即清理iframe并获取数据
+            console.log('🧹 [Vercel访问] 清理iframe');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+            
+            // 访问成功后立即使用Vercel API获取最新数据
+            console.log('📊 [Vercel访问] 访问成功后立即使用Vercel API获取数据');
+            loadGistStats();
         };
         
         iframe.onerror = function() {
@@ -608,9 +605,9 @@ function triggerVercelVisit() {
             if (document.body.contains(iframe)) {
                 document.body.removeChild(iframe);
             }
-            // 访问失败后仍尝试从GIST获取数据
-            console.log('🔄 [Vercel访问] 失败后尝试从GIST获取数据');
-            loadGitHubRepoStats();
+            // 访问失败后仍尝试使用Vercel API获取数据
+            console.log('🔄 [Vercel访问] 失败后尝试使用Vercel API获取数据');
+            loadGistStats();
         };
         
         // 添加到页面
@@ -621,8 +618,8 @@ function triggerVercelVisit() {
     } catch (error) {
         console.log('❌ [Vercel访问] 触发访问时出错:', error.message);
         console.log('❌ [Vercel访问] 错误详情:', error);
-        // 出错后仍尝试从GIST获取数据
-        console.log('🔄 [Vercel访问] 出错后尝试从GIST获取数据');
-        loadGitHubRepoStats();
+        // 出错后仍尝试使用Vercel API获取数据
+        console.log('🔄 [Vercel访问] 出错后尝试使用Vercel API获取数据');
+        loadGistStats();
     }
 }

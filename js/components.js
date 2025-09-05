@@ -130,15 +130,28 @@ async function loadGitHubRepoStats() {
         console.log('🔄 从GIST获取访问统计数据...');
         
         const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
-        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        const timestamp = Date.now(); // 添加时间戳防止缓存
+        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt?v=${timestamp}`;
         
-        const response = await fetch(RAW_URL);
+        console.log('📡 GIST请求URL:', RAW_URL);
+        
+        const response = await fetch(RAW_URL, {
+            cache: 'no-cache', // 禁用缓存
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
+            }
+        });
+        
+        console.log('📡 GIST响应状态:', response.status);
         
         if (response.ok) {
             const content = await response.text();
+            console.log('📄 GIST原始内容:', content);
             
             if (content && content.trim()) {
                 const data = JSON.parse(content);
+                console.log('📊 解析后的数据:', data);
                 
                 // 显示数据
                 counterElement.textContent = data.total_visits || 0;

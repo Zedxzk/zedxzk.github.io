@@ -21,6 +21,8 @@ class ComponentLoader {
             { id: 'sidebar-container', path: 'components/sidebar.html' },
             { id: 'about-container', path: 'components/about.html' },
             { id: 'research-container', path: 'components/research.html' },
+            { id: 'talks-container', path: 'components/talks.html' },
+            { id: 'projects-container', path: 'components/projects.html' },
             { id: 'publications-container', path: 'components/publications.html' },
             { id: 'teaching-container', path: 'components/teaching.html' },
             { id: 'footer-container', path: 'components/footer.html' },
@@ -700,5 +702,36 @@ async function loadGistStatsWithProxy() {
         }
     } catch (error) {
         console.log('❌ CORS代理方式也失败了');
+    }
+}
+
+// 演讲折叠/展开功能
+function toggleTalks(category) {
+    const categoryElement = document.querySelector(`.${category}-talks`) || document.querySelector('.talks-category');
+    const hiddenTalks = categoryElement.querySelectorAll('.talks-hidden');
+    const button = categoryElement.querySelector('.toggle-talks-btn');
+    const buttonTextCn = button.querySelector('.lang-cn');
+    const buttonTextEn = button.querySelector('.lang-en');
+    const arrow = button.querySelector('.arrow');
+    const talksList = categoryElement.querySelector('.talks-list');
+
+    if (hiddenTalks.length > 0 && hiddenTalks[0].style.display === 'none' || hiddenTalks[0].style.display === '') {
+        // 展开
+        hiddenTalks.forEach(talk => talk.style.display = 'list-item');
+        button.classList.add('expanded');
+        buttonTextCn.textContent = '收起 BESIII 报告';
+        buttonTextEn.textContent = 'Show Fewer BESIII Talks';
+        // 展开后滚动到底部查看更多内容
+        setTimeout(() => {
+            talksList.scrollTop = talksList.scrollHeight;
+        }, 100);
+    } else {
+        // 折叠
+        hiddenTalks.forEach(talk => talk.style.display = 'none');
+        button.classList.remove('expanded');
+        buttonTextCn.textContent = '显示更多 BESIII 报告';
+        buttonTextEn.textContent = 'Show More BESIII Talks';
+        // 折叠后滚动到顶部
+        talksList.scrollTop = 0;
     }
 }

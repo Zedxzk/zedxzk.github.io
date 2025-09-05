@@ -603,7 +603,148 @@ footer p {
     margin-bottom: 10px;
 }
 
-/* 响应式设计 */
+/* --- 报告和演讲部分样式 --- */
+.no-talks {
+    text-align: center;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
+    border-radius: 15px;
+    margin: 20px 0;
+    border: 2px dashed #28a745;
+}
+
+.no-talks-text {
+    font-size: 1.2em;
+    color: #155724;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.talking-emojis {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.talking-emojis .emoji {
+    font-size: 2.5em;
+    animation: talk 2.5s ease-in-out infinite;
+}
+
+.talking-emojis .emoji:nth-child(1) { animation-delay: 0s; }
+.talking-emojis .emoji:nth-child(2) { animation-delay: 0.7s; }
+.talking-emojis .emoji:nth-child(3) { animation-delay: 1.4s; }
+.talking-emojis .emoji:nth-child(4) { animation-delay: 2.1s; }
+
+@keyframes talk {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.1) rotate(2deg); }
+    50% { transform: scale(1.15) rotate(0deg); }
+    75% { transform: scale(1.1) rotate(-2deg); }
+}
+
+.talks-list {
+    list-style-type: decimal;
+    padding-left: 20px;
+    margin: 20px 0;
+    max-height: 400px; /* 限制最大高度，大约能显示4个演讲 */
+    overflow-y: auto; /* 添加垂直滚动条 */
+    overflow-x: hidden;
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #3498db #f1f1f1; /* Firefox */
+}
+
+/* Webkit浏览器滚动条样式 */
+.talks-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.talks-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.talks-list::-webkit-scrollbar-thumb {
+    background: #3498db;
+    border-radius: 4px;
+}
+
+.talks-list::-webkit-scrollbar-thumb:hover {
+    background: #2980b9;
+}
+
+.talks-list li {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.talks-list li strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.talks-list li em {
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* --- 演讲类别分组样式 --- */
+.talks-category {
+    margin-bottom: 30px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    background: #fafbfc;
+}
+
+.talks-category h3 {
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+/* 隐藏的演讲样式 */
+.talks-hidden {
+    display: none;
+}
+
+/* 切换按钮样式 */
+.toggle-talks-btn {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 500;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-talks-btn:hover {
+    background: linear-gradient(135deg, #2980b9 0%, #21618c 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.toggle-talks-btn .arrow {
+    font-size: 0.8em;
+    transition: transform 0.3s ease;
+}
+
+.toggle-talks-btn.expanded .arrow {
+    transform: rotate(180deg);
+}
+
+/* --- 响应式设计 */
 @media (max-width: 768px) {
     .counter-grid {
         grid-template-columns: 1fr;
@@ -627,215 +768,6 @@ footer p {
     .counter-item .counter-number {
         font-size: 1.2em;
     }
-}
-
-/* 保留旧样式作为备用 */
-.ga-counter-display .counter-info {
-    margin-bottom: 8px;
-    font-size: 1.1em;
-    color: #155724;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.ga-counter-display .counter-number {
-    color: #28a745;
-    font-size: 1.3em;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 2px solid #28a745;
-    margin-left: 5px;
-}
-
-.ga-counter-display .counter-status {
-    margin-top: 5px;
-}
-
-.ga-counter-display .counter-status small {
-    color: #6f7745;
-    font-style: italic;
-    font-size: 0.8em;
-}
-
-/* 刷新按钮样式 */
-.refresh-btn, .update-btn {
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    cursor: pointer;
-    font-size: 12px;
-    margin: 0 3px;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.refresh-btn:hover, .update-btn:hover {
-    background: #218838;
-    transform: scale(1.1);
-}
-
-.update-btn {
-    background: #fd7e14;
-}
-
-.update-btn:hover {
-    background: #e55a00;
-}
-
-/* 本地计数器样式 */
-.local-counter {
-    text-align: center;
-    margin: 15px 0;
-    padding: 12px;
-    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
-    border-radius: 10px;
-    border: 2px solid #f39c12;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.local-counter .counter-display {
-    font-size: 1em;
-    color: #8b4513;
-    font-weight: 600;
-}
-
-.local-counter .counter-number {
-    color: #e74c3c;
-    font-size: 1.2em;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 2px 8px;
-    border-radius: 15px;
-    border: 1px solid #f39c12;
-}
-
-/* 简易计数器样式 */
-.simple-counter {
-    text-align: center;
-    margin: 15px 0;
-    padding: 12px;
-    background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
-    border-radius: 10px;
-    border: 2px solid #28a745;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.simple-counter .counter-display {
-    font-size: 1em;
-    color: #155724;
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-
-.fallback-counter {
-    text-align: center;
-}
-
-.fallback-counter img {
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    max-width: 100%;
-    height: auto;
-}
-
-/* StatCounter备用方案样式 */
-.statcounter-fallback {
-    text-align: center;
-    margin: 15px 0;
-    padding: 10px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 10px;
-    border: 1px solid #dee2e6;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.statcounter-fallback img {
-    border-radius: 6px;
-    vertical-align: middle;
-    transition: transform 0.2s ease;
-}
-
-.statcounter-fallback img:hover {
-    transform: scale(1.05);
-}
-
-.statcounter-fallback a {
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 8px;
-    color: #495057;
-    font-size: 0.85em;
-    font-weight: 500;
-}
-
-/* GitHub计数器样式 */
-.github-counter {
-    text-align: center;
-    margin: 15px 0;
-    padding: 12px;
-    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-    border-radius: 10px;
-    border: 2px solid #2196f3;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.github-counter .counter-display {
-    font-size: 1em;
-    color: #0d47a1;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.github-counter .counter-number {
-    color: #1565c0;
-    font-size: 1.2em;
-    font-weight: bold;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 2px 8px;
-    border-radius: 15px;
-    border: 1px solid #2196f3;
-}
-
-.counter-status {
-    margin-top: 5px;
-}
-
-.counter-status small {
-    color: #1976d2;
-    font-style: italic;
-    font-size: 0.8em;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .statcounter-display {
-        padding: 8px;
-        margin: 10px 0;
-    }
-    
-    .statcounter-display img {
-        max-width: 100%;
-        height: auto;
-    }
-    
-    .main-layout {
-        flex-direction: column;
-    }
-    .container {
-        margin: 0;
-        padding: 15px;
-        border-radius: 0;
-    }
     
     /* 导航栏响应式 */
     .main-nav ul {
@@ -855,5 +787,152 @@ footer p {
     .profile-pic {
         width: 120px;
         height: 120px;
+    }
+}
+
+/* --- 项目与创造模块样式 --- */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.project-card {
+    background: #fafbfc;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.project-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #3498db;
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.project-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.2em;
+    flex: 1;
+}
+
+.project-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #3498db;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.project-description {
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.project-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.project-link {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: color 0.3s ease;
+}
+
+.project-link:hover {
+    color: #21618c;
+    text-decoration: underline;
+}
+
+.more-projects {
+    text-align: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.more-projects-text {
+    color: #6c757d;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+}
+
+.project-emojis {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.emoji {
+    font-size: 1.5em;
+    animation: bounce 2s infinite;
+}
+
+.emoji:nth-child(2) { animation-delay: 0.2s; }
+.emoji:nth-child(3) { animation-delay: 0.4s; }
+.emoji:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* 项目模块响应式设计 */
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .project-card {
+        padding: 15px;
+    }
+    
+    .project-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .project-links {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .project-link {
+        padding: 5px 0;
     }
 }

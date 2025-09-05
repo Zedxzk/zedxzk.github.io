@@ -98,7 +98,7 @@ function initGitHubCounter() {
     
     console.log(`🌍 环境检测: Vercel=${isVercelEnv}, GitHub=${isGitHubPages}, Local=${isLocalDev}`);
     
-    // 如果是GitHub Pages环境，自动访问Vercel应用来触发计数
+    // 如果是GitHub Pages环境，需要先通过隐藏iframe触发计数
     if (isGitHubPages) {
         console.log('📡 GitHub Pages环境，自动访问Vercel应用...');
         console.log('📡 [Vercel访问] 准备触发自动访问');
@@ -215,10 +215,17 @@ async function loadGistStats() {
         // 检查是否需要计数（防重复访问）
         const shouldCount = checkAndUpdateVisit();
         
+        // 根据环境确定API URL
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const baseUrl = isGitHubPages ? 'https://zedxzk-github-io.vercel.app' : '';
+        const apiUrl = `${baseUrl}/api/counter`;
+        
+        console.log('🔗 API URL:', apiUrl);
+        
         if (shouldCount) {
             // 使用POST请求增加访问计数
             console.log('🆕 新访问，增加计数...');
-            const response = await fetch('/api/counter', {
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -248,8 +255,8 @@ async function loadGistStats() {
             
         } else {
             // 使用GET请求只获取数据，不增加计数
-            console.log('� 重复访问，只获取数据...');
-            const response = await fetch('/api/counter', {
+            console.log('🔄 重复访问，只获取数据...');
+            const response = await fetch(apiUrl, {
                 method: 'GET'
             });
             
@@ -258,7 +265,7 @@ async function loadGistStats() {
             }
             
             const data = await response.json();
-            console.log('� 获取访问数据成功:', data);
+            console.log('✅ 获取访问数据成功:', data);
             
             // 更新显示
             counterElement.textContent = data.total_visits || 0;
@@ -495,15 +502,15 @@ async function loadGistStatsWithProxy() {
             
             if (statusElement) {
                 const envInfo = window.location.hostname.includes('github.io') ? 
-                              'GitHub Pages' : '外部访问';
+                              'GitHub访问' : '外部访问';
                 statusElement.innerHTML = `
-                    <span class="lang-cn">${envInfo} - 只读模式 (${data.last_updated})</span>
-                    <span class="lang-en">${envInfo} - Read-only mode (${data.last_updated})</span>
+                    <span class="lang-cn">${envInfo} (${data.last_updated})</span>
+                    <span class="lang-en">${envInfo} (${data.last_updated})</span>
                 `;
                 setTimeout(applyCurrentLanguage, 100);
             }
             
-            console.log('✅ CORS代理方式加载成功（只读模式）');
+            console.log('✅ CORS代理方式加载成功');
         }
     } catch (error) {
         console.log('❌ CORS代理方式也失败了');
@@ -541,41 +548,7 @@ function toggleTalks(category) {
     }
 }
 
-// GitHub Pages环境下自动访问Vercel应用
-function triggerVercelVisit() {
-    try {
-        console.log('🔍 [Vercel访问] 开始环境检测...');
-        console.log('🔍 [Vercel访问] 当前域名:', window.location.hostname);
-        console.log('🔍 [Vercel访问] 当前协议:', window.location.protocol);
-        console.log('🔍 [Vercel访问] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
-        
-        // 创建一个隐藏的iframe来访问Vercel应用
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = 'none';
-        iframe.src = 'https://zedxzk-github-io.vercel.app';
-        
-        const startTime = Date.now();
-        console.log('🚀 [Vercel访问] 创建iframe，目标URL:', iframe.src);
-        console.log('🚀 [Vercel访问] 开始时间:', new Date(startTime).toISOString());
-        
-        // 设置超时，防止iframe加载过久
-        const timeout = setTimeout(() => {
-            const elapsed = Date.now() - startTime;
-            console.log('⏰ [Vercel访问] 访问超时 (10秒)');
-            console.log('⏰ [Vercel访问] 耗时:', elapsed + 'ms');
-            console.log('⏰ [Vercel访问] 移除iframe');
-            if (document.body.contains(iframe)) {
-                document.body.removeChild(iframe);
-            }
-            // 超时后仍尝试使用Vercel API获取数据
-            console.log('🔄 [Vercel访问] 超时后尝试使用Vercel API获取数据');
-            loadGistStats();
-        }, 10000); // 10秒超时
-        
-        // 当iframe加载完成后移除它
+// 当iframe加载完成后移除它
         iframe.onload = function() {
             const elapsed = Date.now() - startTime;
             console.log('✅ [Vercel访问] 应用访问成功');
@@ -589,37 +562,62 @@ function triggerVercelVisit() {
                 document.body.removeChild(iframe);
             }
             
-            // 访问成功后立即使用Vercel API获取最新数据
-            console.log('📊 [Vercel访问] 访问成功后立即使用Vercel API获取数据');
-            loadGistStats();
+            // 访问成功后通过CORS获取最新数据
+            console.log('📊 [Vercel访问] 访问成功后通过CORS获取数据');
+            loadVercelDataViaCORS();
         };
+
+// 通过CORS获取Vercel数据（只获取，不计数）
+async function loadVercelDataViaCORS() {
+    const counterElement = document.getElementById('github-count');
+    const todayElement = document.getElementById('today-count');
+    const statusElement = document.getElementById('counter-status');
+    
+    if (!counterElement) return;
+    
+    try {
+        console.log('📡 通过CORS获取Vercel数据...');
         
-        iframe.onerror = function() {
-            const elapsed = Date.now() - startTime;
-            console.log('❌ [Vercel访问] 应用访问失败');
-            console.log('❌ [Vercel访问] 耗时:', elapsed + 'ms');
-            console.log('❌ [Vercel访问] 失败时间:', new Date().toISOString());
-            clearTimeout(timeout);
-            
-            console.log('🧹 [Vercel访问] 清理iframe (失败)');
-            if (document.body.contains(iframe)) {
-                document.body.removeChild(iframe);
+        // 使用完整的Vercel API URL
+        const apiUrl = 'https://zedxzk-github-io.vercel.app/api/counter';
+        console.log('🔗 CORS API URL:', apiUrl);
+        
+        // 只使用GET请求获取数据，不计数
+        const response = await fetch(apiUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
             }
-            // 访问失败后仍尝试使用Vercel API获取数据
-            console.log('🔄 [Vercel访问] 失败后尝试使用Vercel API获取数据');
-            loadGistStats();
-        };
+        });
         
-        // 添加到页面
-        document.body.appendChild(iframe);
-        console.log('📤 [Vercel访问] iframe已添加到页面');
-        console.log('🔄 [Vercel访问] 等待访问结果...');
+        if (!response.ok) {
+            throw new Error(`Vercel API响应错误: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ 通过CORS获取数据成功:', data);
+        
+        // 更新显示
+        counterElement.textContent = data.total_visits || 0;
+        if (todayElement) {
+            todayElement.textContent = data.today_visits || 0;
+        }
+        
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">Vercel API (${data.last_updated}) - CORS获取</span>
+                <span class="lang-en">Vercel API (${data.last_updated}) - CORS</span>
+            `;
+            setTimeout(applyCurrentLanguage, 100);
+        }
+        
+        console.log('✅ CORS数据获取完成');
         
     } catch (error) {
-        console.log('❌ [Vercel访问] 触发访问时出错:', error.message);
-        console.log('❌ [Vercel访问] 错误详情:', error);
-        // 出错后仍尝试使用Vercel API获取数据
-        console.log('🔄 [Vercel访问] 出错后尝试使用Vercel API获取数据');
-        loadGistStats();
+        console.log('❌ CORS获取数据失败:', error.message);
+        console.log('🔄 切换到GIST备用方式...');
+        
+        // Fallback到GIST方式
+        await loadGitHubRepoStats();
     }
 }

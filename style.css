@@ -92,6 +92,7 @@ header .affiliation {
 .sidebar {
     flex: 1;
     min-width: 200px;
+    text-align: center;
 }
 .profile-pic {
     width: 180px;
@@ -101,6 +102,16 @@ header .affiliation {
     object-fit: cover;
     border: 3px solid #fff;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 240px; /* 设置最大高度，确保切换时侧边栏宽度不变 */
+}
+.profile-pic:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 .sidebar h3 {
     border-bottom: 2px solid #3498db;
@@ -110,9 +121,12 @@ header .affiliation {
 .contact-info ul, .links ul {
     list-style-type: none;
     padding: 0;
+    text-align: center;
 }
 .contact-info li, .links li {
     margin-bottom: 8px;
+    display: block;
+    text-align: center;
 }
 .contact-info a, .links a {
     text-decoration: none;
@@ -142,8 +156,8 @@ header .affiliation {
 
 /* 链接图标已内置在HTML中，这里只需要调整样式 */
 .links a {
-    display: flex;
-    align-items: center;
+    display: block;
+    text-align: center;
     padding: 4px 0;
     font-weight: 500;
 }
@@ -152,6 +166,37 @@ header .affiliation {
     color: #2980b9;
     transform: translateX(2px);
     transition: all 0.2s ease;
+}
+
+/* 照片注释样式 */
+.photo-caption {
+    text-align: center;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.photo-caption small {
+    color: #666;
+    font-size: 0.8em;
+    font-style: italic;
+    line-height: 1.4;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    /* 新增样式 */
+    max-width: 180px; /* 设置最大宽度为240像素 */
+    width: 100%; /* 确保它能自适应父容器，同时不超过240px */
+    display: block; /* 确保它能独占一行，从而实现换行效果 */
+}
+
+.photo-caption small .lang-cn,
+.photo-caption small .lang-en {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    white-space: normal;
+    display: inline;
 }
 
 .main-content {
@@ -787,6 +832,7 @@ footer p {
     .profile-pic {
         width: 120px;
         height: 120px;
+        max-height: 160px; /* 移动端最大高度 */
     }
 }
 

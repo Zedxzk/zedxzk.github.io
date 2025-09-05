@@ -1,6 +1,12 @@
 <aside class="sidebar">
-    <img src="figs/image.jpg" alt="Profile Photo" class="profile-pic">
-
+    <img src="figs/image.jpg" alt="Profile Photo" class="profile-pic" id="profile-avatar" onclick="toggleProfileImage()">
+    <!-- 照片注释 -->
+    <div id="photo-caption" class="photo-caption" style="display: none;">
+        <small>
+            <span class="lang-cn">由GEMINI2.5-PRO从2025春季BESIII物理软件会合照中取出并处理</span>
+            <span class="lang-en">Extracted and processed from 2025 Spring BESIII Physics Software Conference photo by GEMINI2.5-PRO</span>
+        </small>
+    </div>
     <div class="contact-info">
         <h3><span class="lang-cn">联系方式</span><span class="lang-en">Contact</span></h3>
         <ul>
@@ -28,4 +34,6 @@
             <!-- <li><a href="#" target="_blank">LinkedIn</a></li> -->
         </ul>
     </div>
+
+
 </aside>

@@ -687,3 +687,62 @@ async function loadVercelDataViaCORS() {
         await loadGitHubRepoStats();
     }
 }
+
+// 头像切换功能
+function toggleProfileImage() {
+    const avatar = document.getElementById('profile-avatar');
+    const caption = document.getElementById('photo-caption');
+    if (!avatar) return;
+    
+    const currentSrc = avatar.src;
+    const isAvatar = currentSrc.includes('image.jpg');
+    
+    // 检查是否为移动端
+    const isMobile = window.innerWidth <= 768;
+    const baseWidth = isMobile ? 120 : 180;
+    
+    // 添加切换动画效果
+    avatar.style.transition = 'all 0.3s ease';
+    
+    if (isAvatar) {
+        // 切换到个人照片
+        avatar.src = 'figs/IMG_20250904_230329.png';
+        avatar.alt = 'Personal Photo';
+        // 调整照片尺寸样式 - 与头像保持相同宽度
+        avatar.style.width = baseWidth + 'px';
+        avatar.style.height = (baseWidth * 4 / 3) + 'px'; // 保持4:3的比例
+        avatar.style.objectFit = 'cover';
+        avatar.style.borderRadius = '12px';
+        
+        // 显示照片注释
+        if (caption) {
+            caption.style.display = 'block';
+            // 确保语言设置正确应用到新显示的元素
+            setTimeout(applyCurrentLanguage, 50);
+        }
+        
+        console.log('🔄 切换到个人照片');
+    } else {
+        // 切换回头像
+        avatar.src = 'figs/image.jpg';
+        avatar.alt = 'Profile Photo';
+        // 恢复头像尺寸样式
+        avatar.style.width = baseWidth + 'px';
+        avatar.style.height = baseWidth + 'px';
+        avatar.style.objectFit = 'cover';
+        avatar.style.borderRadius = '50%';
+        
+        // 隐藏照片注释
+        if (caption) {
+            caption.style.display = 'none';
+        }
+        
+        console.log('🔄 切换回头像');
+    }
+    
+    // 添加点击反馈效果
+    avatar.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+        avatar.style.transform = 'scale(1)';
+    }, 150);
+}

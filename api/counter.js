@@ -45,13 +45,16 @@ export default async function handler(req, res) {
             };
         }
         
+        // 检查是否通过iframe访问（带有method=POST参数）
+        const isIframePost = req.query.method === 'POST';
+        
         // GET请求：只返回数据
-        if (req.method === 'GET') {
+        if (req.method === 'GET' && !isIframePost) {
             return res.status(200).json(currentData);
         }
         
-        // POST请求：更新访问计数
-        if (req.method === 'POST') {
+        // POST请求或iframe POST：更新访问计数
+        if (req.method === 'POST' || isIframePost) {
             const today = new Date().toISOString().split('T')[0];
             const isNewDay = currentData.last_updated !== today;
             

@@ -417,6 +417,7 @@ function getActionTriggerToken() {
 }
 
 // 获取GitHub Token（需要有repo权限的token才能触发Actions）
+// 获取GitHub Token（需要有repo权限的token才能触发Actions）
 function getGitHubToken() {
     // 优先从localStorage获取
     const token = localStorage.getItem('github_gist_token');
@@ -556,13 +557,14 @@ function triggerVercelVisit() {
         console.log('🔍 [Vercel访问] 当前协议:', window.location.protocol);
         console.log('🔍 [Vercel访问] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
         
-        // 创建一个隐藏的iframe来访问Vercel应用
+        // 创建一个隐藏的iframe来访问Vercel API的POST端点
         const iframe = document.createElement('iframe');
         iframe.style.display = 'none';
         iframe.style.width = '0';
         iframe.style.height = '0';
         iframe.style.border = 'none';
-        iframe.src = 'https://zedxzk-github-io.vercel.app';
+        // 直接访问API的POST端点来触发计数
+        iframe.src = 'https://zedxzk-github-io.vercel.app/api/counter?method=POST&timestamp=' + Date.now();
         
         const startTime = Date.now();
         console.log('🚀 [Vercel访问] 创建iframe，目标URL:', iframe.src);

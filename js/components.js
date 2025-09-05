@@ -98,6 +98,13 @@ function initGitHubCounter() {
     
     console.log(`🌍 环境检测: Vercel=${isVercelEnv}, GitHub=${isGitHubPages}, Local=${isLocalDev}`);
     
+    // 如果是GitHub Pages环境，自动访问Vercel应用来触发计数
+    if (isGitHubPages) {
+        console.log('📡 GitHub Pages环境，自动访问Vercel应用...');
+        console.log('📡 [Vercel访问] 准备触发自动访问');
+        triggerVercelVisit();
+    }
+    
     // Vercel 环境使用完整功能
     if (isVercelEnv) {
         console.log('🚀 Vercel 环境，使用完整 API 功能');
@@ -105,294 +112,74 @@ function initGitHubCounter() {
         return;
     }
     
-    // GitHub Pages 环境使用免费计数器
-    if (isGitHubPages) {
-        console.log('📚 GitHub Pages 环境，使用免费计数器服务');
-        loadFreeCounterService();
-        return;
-    }
-    
-    // 本地开发环境
-    if (isLocalDev) {
-        console.log('💻 本地开发环境，使用本地存储计数器');
-        loadBasicCounter();
-        return;
-    }
-    
-    // 其他环境，默认使用免费服务
-    console.log('❓ 未知环境，使用免费计数器服务');
-    loadFreeCounterService();
+    // 其他环境使用GitHub仓库统计估算
+    console.log('📊 使用GitHub仓库统计估算');
+    loadGitHubRepoStats();
     
     console.log('访问计数器初始化完成');
-}
-
-// 免费访问计数器服务集成
-function loadFreeCounterService() {
-    const counterElement = document.getElementById('github-count');
-    const todayElement = document.getElementById('today-count');
-    const statusElement = document.getElementById('counter-status');
-    
-    if (!counterElement) return;
-    
-    try {
-        console.log('🎯 加载免费访问计数器服务...');
-        
-        // 使用 HitWebCounter 同时获取总访问量和今日访问量
-        loadHitWebCounters();
-        
-        // 添加访问徽章作为补充显示
-        loadVisitorBadge();
-        
-        // 更新状态
-        if (statusElement) {
-            statusElement.innerHTML = `
-                <span class="lang-cn">免费计数器服务</span>
-                <span class="lang-en">Free Counter Service</span>
-            `;
-            setTimeout(applyCurrentLanguage, 100);
-        }
-        
-    } catch (error) {
-        console.log('加载免费计数器服务失败:', error);
-        // 降级到基础显示
-        loadBasicCounter();
-    }
-}
-
-// HitWebCounter 多计数器集成
-function loadHitWebCounters() {
-    const totalCounterContainer = document.getElementById('total-counter');
-    const todayCounterContainer = document.getElementById('today-counter');
-    
-    // 使用固定的页面ID（基于您的GitHub用户名）
-    const pageId = 'zedxzk_github_io';
-    
-    if (totalCounterContainer) {
-        // 总访问量计数器
-        const totalImg = document.createElement('img');
-        totalImg.src = `https://hitwebcounter.com/counter/counter.php?page=${pageId}_total&style=0025&nbdigits=6&type=page&initCount=0`;
-        totalImg.alt = 'Total Visits Counter';
-        totalImg.style.cssText = 'border: none; display: block; margin: 0 auto;';
-        totalImg.onload = function() {
-            // 当计数器加载完成后，尝试提取数字并更新主显示
-            updateMainCounterFromImage(this, 'github-count');
-        };
-        totalCounterContainer.appendChild(totalImg);
-        console.log('📊 总访问量计数器已加载');
-    }
-    
-    if (todayCounterContainer) {
-        // 今日访问量计数器（使用日期后缀来分别计数）
-        const todayImg = document.createElement('img');
-        const today = new Date().toISOString().split('T')[0];
-        todayImg.src = `https://hitwebcounter.com/counter/counter.php?page=${pageId}_${today}&style=0025&nbdigits=4&type=page&initCount=0`;
-        todayImg.alt = 'Today Visits Counter';
-        todayImg.style.cssText = 'border: none; display: block; margin: 0 auto;';
-        todayImg.onload = function() {
-            updateMainCounterFromImage(this, 'today-count');
-        };
-        todayCounterContainer.appendChild(todayImg);
-        console.log('📅 今日访问量计数器已加载');
-    }
-    
-    console.log('✅ HitWebCounter 计数器已全部加载完成');
-}
-
-// 从计数器图片中提取数字并更新主显示（尝试OCR或估算）
-function updateMainCounterFromImage(imgElement, targetElementId) {
-    // 由于我们无法直接从图片中提取数字，我们使用一些巧妙的方法
-    
-    // 方法1：使用图片的宽度来估算数字长度
-    setTimeout(() => {
-        const targetElement = document.getElementById(targetElementId);
-        if (targetElement && imgElement.naturalWidth > 0) {
-            // 根据图片宽度估算访问量（这是一个近似方法）
-            const estimatedDigits = Math.max(1, Math.floor(imgElement.naturalWidth / 12));
-            const estimatedCount = Math.floor(Math.random() * Math.pow(10, estimatedDigits));
-            
-            // 为了更真实，我们使用一些基准数字
-            let displayCount;
-            if (targetElementId === 'github-count') {
-                // 总访问量：基于页面存在时间的合理估算
-                displayCount = Math.floor(Math.random() * 500) + 100;
-            } else {
-                // 今日访问量：较小的数字
-                displayCount = Math.floor(Math.random() * 50) + 1;
-            }
-            
-            targetElement.textContent = displayCount;
-            
-            // 保存到本地存储，避免频繁变化
-            localStorage.setItem(`counter_${targetElementId}`, displayCount);
-        }
-    }, 1000);
-}
-
-// 改进的本地存储计数器，支持总访问量和今日访问量
-function loadBasicCounter() {
-    const counterElement = document.getElementById('github-count');
-    const todayElement = document.getElementById('today-count');
-    const statusElement = document.getElementById('counter-status');
-    
-    // 获取或创建总访问量
-    let totalVisits = parseInt(localStorage.getItem('site_total_visits') || '0');
-    
-    // 获取今日访问量
-    const today = new Date().toDateString();
-    const lastVisitDate = localStorage.getItem('last_visit_date');
-    let todayVisits = parseInt(localStorage.getItem('site_today_visits') || '0');
-    
-    // 如果是新的一天，重置今日计数
-    if (lastVisitDate !== today) {
-        todayVisits = 0;
-        localStorage.setItem('last_visit_date', today);
-        localStorage.setItem('site_today_visits', '0');
-    }
-    
-    // 检查是否是新访问（使用 sessionStorage 防止同一会话重复计数）
-    const sessionKey = `visited_${today}`;
-    const hasVisitedToday = sessionStorage.getItem(sessionKey);
-    
-    if (!hasVisitedToday) {
-        // 新访问，增加计数
-        totalVisits++;
-        todayVisits++;
-        
-        // 保存到存储
-        localStorage.setItem('site_total_visits', totalVisits.toString());
-        localStorage.setItem('site_today_visits', todayVisits.toString());
-        sessionStorage.setItem(sessionKey, 'true');
-        
-        console.log('📊 新访问已记录:', { total: totalVisits, today: todayVisits });
-    } else {
-        console.log('🔄 重复访问，使用缓存数据:', { total: totalVisits, today: todayVisits });
-    }
-    
-    // 更新显示
-    if (counterElement) counterElement.textContent = totalVisits;
-    if (todayElement) todayElement.textContent = todayVisits;
-    
-    if (statusElement) {
-        statusElement.innerHTML = `
-            <span class="lang-cn">本地计数器 (${today})</span>
-            <span class="lang-en">Local Counter (${today})</span>
-        `;
-        setTimeout(applyCurrentLanguage, 100);
-    }
-    
-    // 创建重置按钮（仅在开发模式下）
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        addDevResetButton();
-    }
-}
-
-// 开发模式：添加重置计数器按钮
-function addDevResetButton() {
-    const statusElement = document.getElementById('counter-status');
-    if (statusElement && !document.getElementById('reset-counter-btn')) {
-        const resetBtn = document.createElement('button');
-        resetBtn.id = 'reset-counter-btn';
-        resetBtn.textContent = '🔄 重置计数器';
-        resetBtn.style.cssText = 'margin-left: 10px; padding: 2px 8px; font-size: 12px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;';
-        resetBtn.onclick = function() {
-            localStorage.removeItem('site_total_visits');
-            localStorage.removeItem('site_today_visits');
-            localStorage.removeItem('last_visit_date');
-            sessionStorage.clear();
-            location.reload();
-        };
-        statusElement.appendChild(resetBtn);
-    }
 }
 
 // GitHub 仓库统计（免费）
 async function loadGitHubRepoStats() {
     const counterElement = document.getElementById('github-count');
-    const statusElement = document.getElementById('counter-status');
-    
-    try {
-        // 获取 GitHub 仓库的基本信息（无需 token）
-        const response = await fetch('https://api.github.com/repos/Zedxzk/zedxzk.github.io');
-        
-        if (response.ok) {
-            const data = await response.json();
-            
-            // 使用仓库的创建时间计算大概访问量
-            const createdDate = new Date(data.created_at);
-            const daysSinceCreation = Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
-            const estimatedVisits = Math.floor(daysSinceCreation * 2.5 + Math.random() * 50); // 估算
-            
-            counterElement.textContent = estimatedVisits;
-            
-            if (statusElement) {
-                statusElement.innerHTML = `
-                    <span class="lang-cn">GitHub 统计 (估算)</span>
-                    <span class="lang-en">GitHub Stats (Estimated)</span>
-                `;
-                setTimeout(applyCurrentLanguage, 100);
-            }
-        }
-    } catch (error) {
-        console.log('GitHub 仓库统计加载失败:', error);
-    }
-}
-
-// 访问徽章显示
-function loadVisitorBadge() {
-    const badgeContainer = document.getElementById('visitor-badge');
-    if (!badgeContainer) return;
-    
-    // 创建访问者徽章
-    const badgeImg = document.createElement('img');
-    badgeImg.src = `https://visitor-badge.laobi.icu/badge?page_id=zedxzk.github.io&left_color=gray&right_color=blue&left_text=Visitors`;
-    badgeImg.alt = 'Visitor Badge';
-    badgeImg.style.marginTop = '10px';
-    
-    badgeContainer.appendChild(badgeImg);
-}
-
-// 基础计数器（本地存储）
-function loadBasicCounter() {
-    const counterElement = document.getElementById('github-count');
     const todayElement = document.getElementById('today-count');
     const statusElement = document.getElementById('counter-status');
     
-    // 从本地存储获取访问计数
-    let totalVisits = parseInt(localStorage.getItem('page_total_visits') || '0');
-    let todayVisits = parseInt(localStorage.getItem('page_today_visits') || '0');
-    const lastVisitDate = localStorage.getItem('last_visit_date');
-    const today = new Date().toDateString();
-    
-    // 检查是否是新的一天
-    if (lastVisitDate !== today) {
-        todayVisits = 0;
-        localStorage.setItem('last_visit_date', today);
-    }
-    
-    // 检查是否是新访问（防重复计数）
-    const sessionKey = 'visited_' + today;
-    if (!sessionStorage.getItem(sessionKey)) {
-        totalVisits++;
-        todayVisits++;
-        sessionStorage.setItem(sessionKey, 'true');
+    try {
+        console.log('🔄 从GIST获取访问统计数据...');
         
-        // 保存到本地存储
-        localStorage.setItem('page_total_visits', totalVisits.toString());
-        localStorage.setItem('page_today_visits', todayVisits.toString());
-    }
-    
-    // 更新显示
-    counterElement.textContent = totalVisits;
-    if (todayElement) {
-        todayElement.textContent = todayVisits;
-    }
-    
-    if (statusElement) {
-        statusElement.innerHTML = `
-            <span class="lang-cn">本地统计 (${today})</span>
-            <span class="lang-en">Local Stats (${today})</span>
-        `;
-        setTimeout(applyCurrentLanguage, 100);
+        const GIST_ID = 'f43cb9d745fd37f6403fdc480ffcdff8';
+        const RAW_URL = `https://gist.githubusercontent.com/Zedxzk/${GIST_ID}/raw/gistfile1.txt`;
+        
+        const response = await fetch(RAW_URL);
+        
+        if (response.ok) {
+            const content = await response.text();
+            
+            if (content && content.trim()) {
+                const data = JSON.parse(content);
+                
+                // 显示数据
+                counterElement.textContent = data.total_visits || 0;
+                if (todayElement) {
+                    todayElement.textContent = data.today_visits || 0;
+                }
+                
+                if (statusElement) {
+                    const envInfo = window.location.hostname.includes('github.io') ? 
+                                  'GitHub Pages' : '外部访问';
+                    statusElement.innerHTML = `
+                        <span class="lang-cn">${envInfo} - GIST数据 (${data.last_updated})</span>
+                        <span class="lang-en">${envInfo} - GIST Data (${data.last_updated})</span>
+                    `;
+                    setTimeout(applyCurrentLanguage, 100);
+                }
+                
+                console.log('✅ GIST数据加载成功:', data);
+            } else {
+                throw new Error('GIST内容为空');
+            }
+        } else {
+            throw new Error(`GIST请求失败: ${response.status}`);
+        }
+    } catch (error) {
+        console.log('❌ GIST数据加载失败:', error.message);
+        
+        // 显示获取失败状态
+        counterElement.textContent = '获取失败';
+        if (todayElement) {
+            todayElement.textContent = '获取失败';
+        }
+        
+        if (statusElement) {
+            statusElement.innerHTML = `
+                <span class="lang-cn">数据获取失败</span>
+                <span class="lang-en">Data Load Failed</span>
+            `;
+            setTimeout(applyCurrentLanguage, 100);
+        }
+        
+        console.log('❌ 显示获取失败状态');
     }
 }
 
@@ -733,5 +520,76 @@ function toggleTalks(category) {
         buttonTextEn.textContent = 'Show More BESIII Talks';
         // 折叠后滚动到顶部
         talksList.scrollTop = 0;
+    }
+}
+
+// GitHub Pages环境下自动访问Vercel应用
+function triggerVercelVisit() {
+    try {
+        console.log('🔍 [Vercel访问] 开始环境检测...');
+        console.log('🔍 [Vercel访问] 当前域名:', window.location.hostname);
+        console.log('🔍 [Vercel访问] 当前协议:', window.location.protocol);
+        console.log('🔍 [Vercel访问] 是否为GitHub Pages:', window.location.hostname.includes('github.io'));
+        
+        // 创建一个隐藏的iframe来访问Vercel应用
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        iframe.src = 'https://zedxzk-github-io.vercel.app';
+        
+        const startTime = Date.now();
+        console.log('🚀 [Vercel访问] 创建iframe，目标URL:', iframe.src);
+        console.log('🚀 [Vercel访问] 开始时间:', new Date(startTime).toISOString());
+        
+        // 设置超时，防止iframe加载过久
+        const timeout = setTimeout(() => {
+            const elapsed = Date.now() - startTime;
+            console.log('⏰ [Vercel访问] 访问超时 (10秒)');
+            console.log('⏰ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('⏰ [Vercel访问] 移除iframe');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        }, 10000); // 10秒超时
+        
+        // 当iframe加载完成后移除它
+        iframe.onload = function() {
+            const elapsed = Date.now() - startTime;
+            console.log('✅ [Vercel访问] 应用访问成功');
+            console.log('✅ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('✅ [Vercel访问] 完成时间:', new Date().toISOString());
+            clearTimeout(timeout);
+            
+            setTimeout(() => {
+                console.log('🧹 [Vercel访问] 清理iframe');
+                if (document.body.contains(iframe)) {
+                    document.body.removeChild(iframe);
+                }
+            }, 1000); // 1秒后移除
+        };
+        
+        iframe.onerror = function() {
+            const elapsed = Date.now() - startTime;
+            console.log('❌ [Vercel访问] 应用访问失败');
+            console.log('❌ [Vercel访问] 耗时:', elapsed + 'ms');
+            console.log('❌ [Vercel访问] 失败时间:', new Date().toISOString());
+            clearTimeout(timeout);
+            
+            console.log('🧹 [Vercel访问] 清理iframe (失败)');
+            if (document.body.contains(iframe)) {
+                document.body.removeChild(iframe);
+            }
+        };
+        
+        // 添加到页面
+        document.body.appendChild(iframe);
+        console.log('📤 [Vercel访问] iframe已添加到页面');
+        console.log('🔄 [Vercel访问] 等待访问结果...');
+        
+    } catch (error) {
+        console.log('❌ [Vercel访问] 触发访问时出错:', error.message);
+        console.log('❌ [Vercel访问] 错误详情:', error);
     }
 }
